@@ -49,7 +49,7 @@ class Board():
 		'Prints the board.'
 		pass
 
-	def display_board(self, display_method=self.display_method):
+	def display_board(self, display_method):
 		'Displays the board, defaulting to the current display method.'
 		pass
 
