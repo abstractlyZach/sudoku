@@ -3,9 +3,9 @@
 # sudokugame.py
 
 class Game():
-	'''Handles all the game logic and interfaces with the board execute moves'''
+	'''Handles all the game logic and interfaces with the board to execute moves.'''
 
-	def __init__(self) -> :
+	def __init__(self):
 		'Starts a new game'
 		pass
 
@@ -39,14 +39,14 @@ class Game():
 		"Remove a number from the given cell"
 		pass
 
-	def save_state(self, state_name='save': str):
+	def save_state(self, state_name: str='save'):
 		'''
 		Saves the current state. Uses state_name to name the csv file in
 		the board's to_csv call. 
 		'''
 		pass
 
-	def load_state(self, state_name='save': str):
+	def load_state(self, state_name: str='save'):
 		'Loads a board state'
 		pass
 
