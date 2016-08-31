@@ -57,6 +57,9 @@ class Board():
 		'Sets the current display method.'
 		pass
 
+	def set_board(self, board):
+		'Sets the current board to the given board.'
+
 	def _box_indices(self, row: int, column: int):
 		'Returns the indices for all the members of the given 3x3 box.'
 		pass
