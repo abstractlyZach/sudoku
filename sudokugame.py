@@ -35,6 +35,14 @@ class Game():
 		"Executes a move if it's valid. Otherwise, throws an error."
 		pass
 
+	def undo_move(self):
+		"Undoes the last move if possible. Otherwise throws and exception."
+		pass
+
+	def redo_move(self):
+		"Redoes the last move if possible. Otherwise throws an exception."
+		pass
+
 	def remove(self, row: int, column: int):
 		"Remove a number from the given cell"
 		pass
