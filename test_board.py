@@ -2,6 +2,7 @@
 
 import unittest
 import board
+import os
 
 empty_board = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			   [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -150,3 +151,47 @@ class AdvancedBoardTestCase(unittest.TestCase):
 					self.assertEqual(test_board2.get_cell(row, column), 0)
 				else:
 					self.assertEqual(test_board2.get_cell(row, column), full_board[row][column])
+
+	def test_to_csv(self):
+		self.test_board.to_csv('test_board.csv')
+		self.test_board2.to_csv('test_board2.csv')
+		self.test_board3.to_csv('test_board3.csv')
+
+		with open('test_board.csv', 'r') as file:
+			text = file.readlines()
+			self.assertEqual(len(text), 9)
+			for row_number, row in enumerate(text):
+				self.assertEqual(row, str(empty_board[row_number])[1:-1])
+
+		with open('test_board2.csv', 'r') as file:
+			text = file.readlines()
+			self.assertEqual(len(text), 9)
+			for row_number, row in enumerate(text):
+				self.assertEqual(row, str(full_board[row_number])[1:-1])
+
+		with open('test_board3.csv', 'r') as file:
+			text = file.readlines()
+			self.assertEqual(len(text), 9)
+			for row_number, row in enumerate(text):
+				self.assertEqual(row, str(incomplete_board[row_number])[1:-1])
+
+		os.remove('test_board.csv')
+		os.remove('test_board2.csv')
+		os.remove('test_board3.csv')
+
+	def test_read_csv(self):
+		self.test_board.to_csv('test_board.csv')
+		self.test_board2.to_csv('test_board2.csv')
+		self.test_board3.to_csv('test_board3.csv')
+		test_board_a = board.Board()
+		test_board_a.read_csv('test_board.csv')
+		test_board_b = board.Board()
+		test_board_b.read_csv('test_board2.csv')
+		test_board_c = board.Board()
+		test_board_c.read_csv('test_board3.csv')
+		self.assertEqual(test_board.get_board(), test_board_a.get_board())
+		self.assertEqual(test_board2.get_board(), test_board_b.get_board())
+		self.assertEqual(test_board3.get_board(), test_board_c.get_board())
+		os.remove('test_board.csv')
+		os.remove('test_board2.csv')
+		os.remove('test_board3.csv')
