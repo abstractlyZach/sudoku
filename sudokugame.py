@@ -89,3 +89,11 @@ class SameColumnException(Exception):
 class SameBoxException(Exception):
 	'Exception for moves whose numbers have already been seen in the same box.'
 	pass
+
+class UndoStackException(Exception):
+	'Exception for when the undo stack is empty and someone tries to undo a move.'
+	pass
+
+class RedoStackException(Exception):
+	'Exception for when the redo stack is empty and someone tries to redo a move.'
+	pass
