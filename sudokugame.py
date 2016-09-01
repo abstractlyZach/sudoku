@@ -32,7 +32,10 @@ class Game():
 		pass
 
 	def make_move(self, row: int, column: int, number: int):
-		"Executes a move if it's valid. Otherwise, throws an error."
+		'''
+		Executes a move if it's valid. Otherwise, throws an error. Making a move clears
+		the redo stack and adds an item to the undo stack.
+		'''
 		pass
 
 	def undo_move(self):
