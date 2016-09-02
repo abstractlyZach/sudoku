@@ -29,6 +29,22 @@ class Game():
 		'Returns a representation of the game board.'
 		pass
 
+	def get_cell(self, row: int, column: int):
+		'Returns the value of a cell.'
+		pass
+
+	def get_row(self, row: int):
+		'Returns the values of a row.'
+		pass
+
+	def get_column(self, column: int):
+		'Returns the values of a column.'
+		pass
+
+	def get_box(self, row: int, column: int):
+		'Returns the values of the 3x3 box that the given cell is a member of.'
+		pass
+
 	def open_cells(self):
 		'Returns a list of the cells that are empty.'
 		pass
