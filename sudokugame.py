@@ -22,7 +22,7 @@ class Game():
 		pass
 
 	def new_game(self):
-		'Creates a new board to start a new game'
+		'Undoes all moves to reset back to the loaded board.'
 		pass
 
 	def get_board(self):
