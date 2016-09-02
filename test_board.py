@@ -197,3 +197,6 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		os.remove('test_board.csv')
 		os.remove('test_board2.csv')
 		os.remove('test_board3.csv')
+
+	if __name__ == '__main__':
+		unittest.main()
