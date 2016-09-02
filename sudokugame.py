@@ -9,9 +9,10 @@ class Game():
 		'Starts a new game'
 		pass
 
-	def valid_move(self, row: int, column: int, number: int) -> bool:
+	def validate_move(self, row: int, column: int, number: int):
 		'''
-		Returns a boolean describing whether or not the given move is valid on the board.
+		Validates a move. If no exceptions are raised, the move is valid.
+		This function will raise the appropriate exception for the validity of the move
 		Needs to check:
 			(1) Cell is within the board's bounds
 			(2) Cell is not occupied
@@ -74,6 +75,30 @@ class Game():
 		"Prints the board using the board's print_board method"
 		pass
 
+	def _is_move_in_bounds(self, row: int, column: int):
+		'Checks if the move is in bounds.'
+		pass
+
+	def _is_move_in_occupied_cell(self, row: int, column: int):
+		'Checks if the move is in an occupied cell.'
+		pass
+
+	def _is_move_in_same_row(self, row: int, number: int):
+		'Checks if the number is in the same row.'
+		pass
+
+	def _is_move_in_same_column(self, column: int, number: int):
+		'Checks if the number is in the same column.'
+		pass
+
+	def _is_move_in_same_box(self, row: int, column: int, number: int):
+		'Checks if the number is in the same box.'
+		pass
+
+	def _is_number_valid(self, number: int):
+		'Checks if the number is 1-9.'
+		pass
+
 
 class OccupiedCellException(Exception):
 	'Exception for trying to make a move on an occupied cell.'
@@ -93,6 +118,10 @@ class SameColumnException(Exception):
 
 class SameBoxException(Exception):
 	'Exception for moves whose numbers have already been seen in the same box.'
+	pass
+
+class InvalidEntryException(Exception):
+	'Exception for entries that are not 1-9'
 	pass
 
 class UndoStackException(Exception):
