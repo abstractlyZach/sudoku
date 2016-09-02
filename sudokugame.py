@@ -75,11 +75,11 @@ class Game():
 		"Prints the board using the board's print_board method"
 		pass
 
-	def _is_move_in_bounds(self, row: int, column: int):
+	def _is_in_bounds(self, row: int, column: int):
 		'Checks if the move is in bounds.'
 		pass
 
-	def _is_move_in_occupied_cell(self, row: int, column: int):
+	def _is_cell_occupied(self, row: int, column: int):
 		'Checks if the move is in an occupied cell.'
 		pass
 

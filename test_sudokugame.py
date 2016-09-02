@@ -118,57 +118,62 @@ class GameLogicTestCase(unittest.TestCase):
 	def test_valid_move_bounds(self):
 		for row in range(9):
 			for column in range(9):
-				self.assertTrue(self.game1.valid_move(row, column, 7))
-		for row in [-1, 9, 20]:
-			self.assertFalse(self.game1.valid_move(row, 5, 3))
-		for column in [-3, 0, 9, 14]:
-			self.assertFalse(self.game1.valid_move(2, column, 6))
+				self.assertTrue(self.game1._is_in_bounds(row, column))
+		for row in [-1, 0, 9, 20]:
+			self.assertFalse(self.game1._is_in_bounds(row, 5))
+		for column in [-3, -1, 0, 9, 14]:
+			self.assertFalse(self.game1._is_in_bounds(2, column))
 
 	def test_valid_move_occupied_cell(self):
 		for row in range(9):
 			for column in range(9):
-				self.assertTrue(self.game1.valid_move(row, column, 7))
+				self.assertTrue(self.game1._is_cell_occupied(row, column))
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(self.game2.valid_move(row, column, 2))
+				self.assertFalse(self.game2._is_cell_occupied(row, column))
 
 	def test_valid_move_same_row(self):
 		game = sudokugame.Game()
 		game._board.add(3, 6, 2)
 		for column in range(9):
-			self.assertFalse(game.valid_move(3, column, 2))
+			self.assertFalse(game._is_move_in_same_row(3, column, 2))
 		game._board.remove(3, 6)
 		for row in range(9):
 			game._board.add(row, row, 1)
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(game.valid_move(row, column, 1))
+				self.assertFalse(game._is_move_in_same_row(row, column, 1))
 
 	def test_valid_move_same_column(self):
 		game = sudokugame.Game()
 		game._board.add(2, 1, 8)
 		for row in range(9):
-			self.assertFalse(game.valid_move(row, 1, 8))
+			self.assertFalse(game._is_move_in_same_column(row, 1, 8))
 		game._board.remove(2, 1)
 		for column in range(9):
 			game._board.add(column, column, 9)
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(game.valid_move(row, column, 9))
+				self.assertFalse(game._is_move_in_same_column(row, column, 9))
 
 	def test_valid_move_same_box(self):
 		game = sudokugame.Game()
 		game._board.add(5, 5, 4)
 		for row in range(3, 6):
 			for column in range(3, 6):
-				self.assertFalse(game.valid_move(row, column, 4))
+				self.assertFalse(game._is_move_in_same_box(row, column, 4))
 		game._board.remove(5, 5)
 		for row in [1, 4, 7]:
 			for column in [2, 5, 8]:
 				game._board.add(row, column, 5)
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(game.valid_move(row, column 5))
+				self.assertFalse(game._is_move_in_same_box(row, column, 5))
+
+	def test_valid_move_number_invalid(self):
+		for i in [-5, -1, 0, 10, 20]:
+			self.assertFalse(self.game1._is_number_valid(i))
+
 
 	
 if __name__ == '__main__':	
