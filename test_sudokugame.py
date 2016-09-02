@@ -235,7 +235,7 @@ class MoveTestCase(unittest.TestCase):
 			for column in range(9):
 				if (row, column) == (8, 8):
 					should_be = 3
-				else if (row, column) == (7, 2):
+				elif (row, column) == (7, 2):
 					should_be = 9
 				else:
 					should_be = 0
