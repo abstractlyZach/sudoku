@@ -123,7 +123,7 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		self.test_board.add(0, 0, 1)
 		for row in range(9):
 			for column in range(9):
-				if row, column == (0, 0):
+				if (row, column) == (0, 0):
 					self.assertEqual(self.test_board.get_cell(row, column), 1)
 				else:
 					self.assertEqual(self.test_board.get_cell(row, column), 0)
@@ -131,7 +131,7 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		self.test_board.add(0, 0, 2)
 		for row in range(9):
 			for column in range(9):
-				if row, column == (0, 0):
+				if (row, column) == (0, 0):
 					self.assertEqual(self.test_board.get_cell(row, column), 2)
 				else:
 					self.assertEqual(self.test_board.get_cell(row, column), 0)
@@ -149,7 +149,7 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		self.test_board2.clear(5, 7)
 		for row in range(9):
 			for column in range(9):
-				if row, column = (5, 7):
+				if (row, column) == (5, 7):
 					self.assertEqual(test_board2.get_cell(row, column), 0)
 				else:
 					self.assertEqual(test_board2.get_cell(row, column), full_board[row][column])
