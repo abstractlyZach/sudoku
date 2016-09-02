@@ -16,6 +16,7 @@ class Game():
 			(1) Cell is within the board's bounds
 			(2) Cell is not occupied
 			(3) The move doesn't have any of the same entry in the same column, row, or box.
+			(4) The number to enter is not 1-9
 		'''
 		pass
 
@@ -46,14 +47,18 @@ class Game():
 		"Redoes the last move if possible. Otherwise throws an exception."
 		pass
 
+# I'm considering removing this method. Why would someone ever remove a move when
+#	they have a ton of other decisions that probably relied on that move?
+#	Undoing all the way back to the move in question seems to be the only one that makes sense
 	def remove(self, row: int, column: int):
 		"Remove a number from the given cell"
 		pass
 
+# maybe have save states include undo and redo stacks. I'm still trying to figure out if that makes sense or not.
 	def save_state(self, state_name: str='save'):
 		'''
 		Saves the current state. Uses state_name to name the csv file in
-		the board's to_csv call. 
+		the board's to_csv call.
 		'''
 		pass
 
