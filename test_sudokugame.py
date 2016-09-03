@@ -113,9 +113,9 @@ class GameLogicTestCase(unittest.TestCase):
 		self.game3.load_state('save_state3')	
 
 	def test_check_victory(self):
-		self.assertFalse(game1.check_victory())
-		self.assertTrue(game2.check_victory())
-		self.assertFalse(game3.check_victory())		
+		self.assertFalse(self.game1.check_victory())
+		self.assertTrue(self.game2.check_victory())
+		self.assertFalse(self.game3.check_victory())		
 
 	def test_valid_move_bounds(self):
 		for row in range(9):
@@ -137,26 +137,30 @@ class GameLogicTestCase(unittest.TestCase):
 	def test_valid_move_same_row(self):
 		game = sudokugame.Game()
 		game._board.add(3, 6, 2)
-		for column in range(9):
-			self.assertFalse(game._is_move_in_same_row(3, column, 2))
+		for row in range(9):
+			if row == 3:
+				self.assertTrue(game._is_move_in_same_row(row, 2))
+			else:
+				self.assertFalse(game._is_move_in_same_row(row, 2))
 		game._board.remove(3, 6)
 		for row in range(9):
 			game._board.add(row, row, 1)
 		for row in range(9):
-			for column in range(9):
-				self.assertFalse(game._is_move_in_same_row(row, column, 1))
+			self.assertTrue(game._is_move_in_same_row(row, 1))
 
 	def test_valid_move_same_column(self):
 		game = sudokugame.Game()
 		game._board.add(2, 1, 8)
-		for row in range(9):
-			self.assertFalse(game._is_move_in_same_column(row, 1, 8))
-		game._board.remove(2, 1)
 		for column in range(9):
-			game._board.add(column, column, 9)
+			if column == 1:
+				self.assertTrue(game._is_move_in_same_column(column, 8))
+			else:
+				self.assertFalse(game._is_move_in_same_column(column, 8))
+		game._board.remove(3, 6)
+		for column in range(9):
+			game._board.add(column, column, 7)
 		for row in range(9):
-			for column in range(9):
-				self.assertFalse(game._is_move_in_same_column(row, column, 9))
+			self.assertTrue(game._is_move_in_same_column(column, 7))
 
 	def test_valid_move_same_box(self):
 		game = sudokugame.Game()
