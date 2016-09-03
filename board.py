@@ -48,14 +48,14 @@ class Board():
 	def to_csv(self, filename):
 		'Saves board to a csv file format at the given filename.'
 		with open(filename, 'w') as write_file:
-			writer = csv.writer(write_file, delimiter=', ')
+			writer = csv.writer(write_file, delimiter=',')
 			for row in self._board:
 				writer.writerow(row)
 
 	def read_csv(self, filename):
 		'Loads board from the csv file at the given filename.'
 		with open(filename, 'r') as read_file:
-			reader = csv.reader(read_file, delimiter=', ')
+			reader = csv.reader(read_file, delimiter=',')
 			new_board = []
 			for row in reader:
 				row_list = []
