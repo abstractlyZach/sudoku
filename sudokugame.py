@@ -25,13 +25,13 @@ class Game():
 		'''
 		if not self._is_in_bounds(row, column):
 			raise CellOutOfBoundsException
-		if not self._is_cell_occupied(row, column):
+		if self._is_cell_occupied(row, column):
 			raise OccupiedCellException
-		if not self._is_move_in_same_row(row, number):
+		if self._is_move_in_same_row(row, number):
 			raise SameRowException
-		if not self._is_move_in_same_column(column, number):
+		if self._is_move_in_same_column(column, number):
 			raise SameColumnException
-		if not self._is_move_in_same_box(row, column, number):
+		if self._is_move_in_same_box(row, column, number):
 			raise SameBoxException
 		if not self._is_number_valid(number):
 			raise InvalidEntryException
@@ -85,7 +85,7 @@ class Game():
 		if len(self._undo_stack) == 0:
 			raise UndoStackException
 		row, column, number = self._undo_stack.pop()
-		self._redo_stack.append(row, column, number)
+		self._redo_stack.append((row, column, number))
 		self._board.clear(row, column)
 
 	def redo_move(self):
@@ -93,7 +93,7 @@ class Game():
 		if len(self._redo_stack) == 0:
 			raise RedoStackException
 		row, column, number = self._redo_stack.pop()
-		self._undo_stack.append(row, column, number)
+		self._undo_stack.append((row, column, number))
 		self._board.add(row, column, number)
 
 # I'm considering removing this method. Why would someone ever remove a move when
@@ -139,7 +139,7 @@ class Game():
 		for box_coord in [(0, 0), (3, 0), (6, 0), 
 							(0, 3), (3, 3), (6, 3), 
 							(0, 6), (3, 6), (6, 6)]:
-			box = self.get_box(box_coord)
+			box = self.get_box(box_coord[0], box_coord[1])
 			for i in range(1, 10):
 				if i not in box:
 					return False
@@ -155,7 +155,7 @@ class Game():
 
 	def _is_cell_occupied(self, row: int, column: int):
 		'Checks if the move is in an occupied cell.'
-		return self.get_cell(row, column) == 0
+		return self.get_cell(row, column) != 0
 
 	def _is_move_in_same_row(self, row: int, number: int):
 		'Checks if the number is in the same row.'
