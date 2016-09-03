@@ -98,7 +98,7 @@ class AdvancedUtilitiesTestCase(unittest.TestCase):
 		self.game2.save_state('state_b')
 		game.load_state('state_b')
 		self.assertEqual(game.get_board(), self.game2.get_board())
-		self.game2.save_state('state_c')
+		self.game3.save_state('state_c')
 		game.load_state('state_c')
 		self.assertEqual(game.get_board(), self.game3.get_board())
 
@@ -121,18 +121,18 @@ class GameLogicTestCase(unittest.TestCase):
 		for row in range(9):
 			for column in range(9):
 				self.assertTrue(self.game1._is_in_bounds(row, column))
-		for row in [-1, 0, 9, 20]:
+		for row in [-1, 9, 20]:
 			self.assertFalse(self.game1._is_in_bounds(row, 5))
-		for column in [-3, -1, 0, 9, 14]:
+		for column in [-3, -1, 9, 14]:
 			self.assertFalse(self.game1._is_in_bounds(2, column))
 
 	def test_valid_move_occupied_cell(self):
 		for row in range(9):
 			for column in range(9):
-				self.assertTrue(self.game1._is_cell_occupied(row, column))
+				self.assertFalse(self.game1._is_cell_occupied(row, column))
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(self.game2._is_cell_occupied(row, column))
+				self.assertTrue(self.game2._is_cell_occupied(row, column))
 
 	def test_valid_move_same_row(self):
 		game = sudokugame.Game()
@@ -142,7 +142,7 @@ class GameLogicTestCase(unittest.TestCase):
 				self.assertTrue(game._is_move_in_same_row(row, 2))
 			else:
 				self.assertFalse(game._is_move_in_same_row(row, 2))
-		game._board.remove(3, 6)
+		game._board.clear(3, 6)
 		for row in range(9):
 			game._board.add(row, row, 1)
 		for row in range(9):
@@ -156,7 +156,7 @@ class GameLogicTestCase(unittest.TestCase):
 				self.assertTrue(game._is_move_in_same_column(column, 8))
 			else:
 				self.assertFalse(game._is_move_in_same_column(column, 8))
-		game._board.remove(3, 6)
+		game._board.clear(3, 6)
 		for column in range(9):
 			game._board.add(column, column, 7)
 		for row in range(9):
@@ -167,14 +167,14 @@ class GameLogicTestCase(unittest.TestCase):
 		game._board.add(5, 5, 4)
 		for row in range(3, 6):
 			for column in range(3, 6):
-				self.assertFalse(game._is_move_in_same_box(row, column, 4))
-		game._board.remove(5, 5)
+				self.assertTrue(game._is_move_in_same_box(row, column, 4))
+		game._board.clear(5, 5)
 		for row in [1, 4, 7]:
 			for column in [2, 5, 8]:
 				game._board.add(row, column, 5)
 		for row in range(9):
 			for column in range(9):
-				self.assertFalse(game._is_move_in_same_box(row, column, 5))
+				self.assertTrue(game._is_move_in_same_box(row, column, 5))
 
 	def test_valid_move_number_invalid(self):
 		for i in [-5, -1, 0, 10, 20]:
@@ -182,6 +182,14 @@ class GameLogicTestCase(unittest.TestCase):
 
 
 class MoveTestCase(unittest.TestCase):
+	def setUp(self):
+		self.game1 = sudokugame.Game()
+		self.game2 = sudokugame.Game()
+		self.game3 = sudokugame.Game()
+		self.game1.load_state('save_state')
+		self.game2.load_state('save_state2')
+		self.game3.load_state('save_state3')	
+
 	def test_make_move(self):
 		self.game1.make_move(1, 1, 2)
 		for row in range(9):
@@ -190,7 +198,7 @@ class MoveTestCase(unittest.TestCase):
 					should_be = 2
 				else:
 					should_be = 0
-				self.assertTrue(self.game1.get_board()[row][column])
+				self.assertEqual(self.game1.get_board()[row][column], should_be)
 		self.assertEqual(self.game1._undo_stack, [(1,1,2)])
 		self.assertEqual(self.game1._redo_stack, [])
 		self.assertRaises(sudokugame.OccupiedCellException, self.game1.make_move, 1, 1, 3)
@@ -216,14 +224,14 @@ class MoveTestCase(unittest.TestCase):
 		self.assertEqual(self.game1._undo_stack, [])
 		self.assertEqual(self.game1._redo_stack, [(1, 2, 3), (2, 3, 5)])
 		# illegal undo
-		self.assertRaises(sudokugame.UndoStackException, self.game1.undo)
+		self.assertRaises(sudokugame.UndoStackException, self.game1.undo_move)
 
 	def test_redo(self):
 		self.game1.make_move(8, 8, 3)
 		self.game1.make_move(7, 2, 9)
-		self.game1.undo()
-		self.game1.undo()
-		self.game1.redo()
+		self.game1.undo_move()
+		self.game1.undo_move()
+		self.game1.redo_move()
 		for row in range(9):
 			for column in range(9):
 				if (row, column) == (8, 8):
@@ -231,10 +239,10 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [])
+		self.assertEqual(self.game1._undo_stack, [(8, 8, 3)])
 		self.assertEqual(self.game1._redo_stack, [(7, 2, 9)])
 		# redo #2
-		self.game1.redo()
+		self.game1.redo_move()
 		for row in range(9):
 			for column in range(9):
 				if (row, column) == (8, 8):
@@ -244,10 +252,10 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [])
+		self.assertEqual(self.game1._undo_stack, [(8, 8, 3), (7, 2, 9)])
 		self.assertEqual(self.game1._redo_stack, [])
 		# illegal redo
-		self.assertRaises(sudokugame.RedoStackException, self.game1.redo)
+		self.assertRaises(sudokugame.RedoStackException, self.game1.redo_move)
 
 	def test_make_move_OOB(self):
 		self.assertRaises(sudokugame.CellOutOfBoundsException, self.game1.make_move, 1, 9, 2)
@@ -264,18 +272,16 @@ class MoveTestCase(unittest.TestCase):
 		self.assertRaises(sudokugame.SameColumnException, self.game3.make_move, 8, 0, 4)
 
 	def test_make_move_same_box(self):
-		self.assertRaises(sudokugame.SameBoxException, self.game3.make_move, 0, 2, 4)
 		self.assertRaises(sudokugame.SameBoxException, self.game3.make_move, 1, 2, 4)
 		self.assertRaises(sudokugame.SameBoxException, self.game3.make_move, 2, 2, 4)
 		self.assertRaises(sudokugame.SameBoxException, self.game3.make_move, 2, 1, 4)
-		self.assertRaises(sudokugame.SameBoxException, self.game3.make_move, 2, 0, 4)
 
 	def test_make_move_redo_stack_cleared(self):
 		self.game1.make_move(8, 2, 6)
 		self.game1.make_move(7, 2, 9)
 		self.game1.make_move(2, 3, 3)
 		self.game1.make_move(4, 2, 7)
-		self.game1.undo()
+		self.game1.undo_move()
 		self.game1.make_move(3, 5, 1)
 		self.assertEqual(self.game1._undo_stack, [(8,2,6), (7, 2, 9), (2, 3, 3), (3, 5, 1)])
 		self.assertEqual(self.game1._redo_stack, [])
