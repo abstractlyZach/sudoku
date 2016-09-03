@@ -101,6 +101,9 @@ class AdvancedUtilitiesTestCase(unittest.TestCase):
 		self.game3.save_state('state_c')
 		game.load_state('state_c')
 		self.assertEqual(game.get_board(), self.game3.get_board())
+		os.remove('state_a.csv')
+		os.remove('state_b.csv')
+		os.remove('state_c.csv')
 
 
 class GameLogicTestCase(unittest.TestCase):
