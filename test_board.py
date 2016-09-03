@@ -69,19 +69,19 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		self.test_boards = [self.test_board, self.test_board2, self.test_board3]
 
 	def test_get_cell(self):
-		for a_board in test_boards:
+		for a_board in self.test_boards:
 			for row in range(9):
 				for column in range(9):
 					self.assertEqual(a_board.get_cell(row, column), 
-									a_board.get_board[row][column])
+									a_board.get_board()[row][column])
 
 	def test_get_row(self):
-		for a_board in test_boards:
+		for a_board in self.test_boards:
 			for row in range(9):
 				self.assertEqual(a_board.get_row(row), a_board.get_board()[row])
 
 	def test_get_column(self):
-		for a_board in test_boards:
+		for a_board in self.test_boards:
 			for column in range(9):
 				self.assertEqual(a_board.get_column(column), 
 								[a_board.get_board()[row][column] for row in range(9)])
@@ -99,11 +99,11 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		for row in range(9):
 			for column in range(9):
 				if (row // 3 == 0) and (column // 3 == 0):
-					self.assertEqual(test_board._box_indices(row, column), box0_indices)
+					self.assertEqual(self.test_board._box_indices(row, column), box0_indices)
 				if (row // 3 == 0) and (column // 3 == 2):
-					self.assertEqual(test_board._box_indices(row, column), box3_indices)
+					self.assertEqual(self.test_board._box_indices(row, column), box3_indices)
 				if (row // 3 == 2) and (column // 3 == 2):
-					self.assertEqual(test_board._box_indices(row, column), box8_indices)
+					self.assertEqual(self.test_board._box_indices(row, column), box8_indices)
 
 	def test_get_box(self):
 		for row in range(9):
@@ -150,9 +150,9 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		for row in range(9):
 			for column in range(9):
 				if (row, column) == (5, 7):
-					self.assertEqual(test_board2.get_cell(row, column), 0)
+					self.assertEqual(self.test_board2.get_cell(row, column), 0)
 				else:
-					self.assertEqual(test_board2.get_cell(row, column), full_board[row][column])
+					self.assertEqual(self.test_board2.get_cell(row, column), full_board[row][column])
 
 	def test_to_csv(self):
 		self.test_board.to_csv('test_board.csv')
@@ -163,19 +163,19 @@ class AdvancedBoardTestCase(unittest.TestCase):
 			text = file.readlines()
 			self.assertEqual(len(text), 9)
 			for row_number, row in enumerate(text):
-				self.assertEqual(row, str(empty_board[row_number])[1:-1])
+				self.assertEqual(row, ','.join(map(str, empty_board[row_number])) + '\n')
 
 		with open('test_board2.csv', 'r') as file:
 			text = file.readlines()
 			self.assertEqual(len(text), 9)
 			for row_number, row in enumerate(text):
-				self.assertEqual(row, str(full_board[row_number])[1:-1])
+				self.assertEqual(row, ','.join(map(str, full_board[row_number])) + '\n')
 
 		with open('test_board3.csv', 'r') as file:
 			text = file.readlines()
 			self.assertEqual(len(text), 9)
 			for row_number, row in enumerate(text):
-				self.assertEqual(row, str(incomplete_board[row_number])[1:-1])
+				self.assertEqual(row, ','.join(map(str, incomplete_board[row_number])) + '\n')
 
 		os.remove('test_board.csv')
 		os.remove('test_board2.csv')
@@ -191,12 +191,12 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		test_board_b.read_csv('test_board2.csv')
 		test_board_c = board.Board()
 		test_board_c.read_csv('test_board3.csv')
-		self.assertEqual(test_board.get_board(), test_board_a.get_board())
-		self.assertEqual(test_board2.get_board(), test_board_b.get_board())
-		self.assertEqual(test_board3.get_board(), test_board_c.get_board())
+		self.assertEqual(self.test_board.get_board(), test_board_a.get_board())
+		self.assertEqual(self.test_board2.get_board(), test_board_b.get_board())
+		self.assertEqual(self.test_board3.get_board(), test_board_c.get_board())
 		os.remove('test_board.csv')
 		os.remove('test_board2.csv')
 		os.remove('test_board3.csv')
 
-	if __name__ == '__main__':
+if __name__ == '__main__':
 		unittest.main()
