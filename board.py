@@ -70,7 +70,7 @@ class Board():
 		print('-' * 21)
 		for row in self.get_board():
 			row_list = ['|'] + row + ['|']
-			print(' '.join(row_list))
+			print(' '.join(map(str, row_list)))
 		print('-' * 21)
 
 	def display_board(self):
