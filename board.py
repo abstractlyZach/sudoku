@@ -74,7 +74,12 @@ class Board():
 			for i in range(9):
 				if i % 3 == 0:
 					row_list.append('|')
-				row_list.append(row[i])
+				else:
+					pass
+				if row[i] == 0:
+					row_list.append(' ')
+				else:
+					row_list.append(row[i])
 			row_list.append('|')
 			print(' '.join(map(str, row_list)))
 		print('-' * 25)
