@@ -173,6 +173,12 @@ class Game():
 		'Checks if the number is 1-9.'
 		return (number <= 9) and (number >= 1)
 
+def get_game_exceptions():
+	'Returns all of the exceptions so that other modules can use them in their error handling'
+	return (OccupiedCellException, CellOutOfBoundsException, SameRowException,
+			SameColumnException, SameBoxException, InvalidEntryException, UndoStackException,
+			RedoStackException, BoardException)
+
 
 class OccupiedCellException(Exception):
 	'Exception for trying to make a move on an occupied cell.'
