@@ -67,11 +67,17 @@ class Board():
 
 	def print_board(self):
 		'Prints the board.'
-		print('-' * 21)
-		for row in self.get_board():
-			row_list = ['|'] + row + ['|']
+		for index, row in enumerate(self.get_board()):
+			if index % 3 == 0:
+				print('-' * 25)
+			row_list = []
+			for i in range(9):
+				if i % 3 == 0:
+					row_list.append('|')
+				row_list.append(row[i])
+			row_list.append('|')
 			print(' '.join(map(str, row_list)))
-		print('-' * 21)
+		print('-' * 25)
 
 	def display_board(self):
 		'Displays the board according to the current display method.'
