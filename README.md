@@ -1,6 +1,7 @@
 # sudoku
 I'm working on this project with Ryan Aveo (https://github.com/ryanaveo/) to improve our programming skills. 
-We each have our own implementations of the code, but we're writing them with the same requirements. Check out his code here:
+We each have our own implementations of the code, but we're writing them with the same requirements. 
+Check out his code here:
 * https://github.com/ryanaveo/sudoku
 
 ## Road Map:
