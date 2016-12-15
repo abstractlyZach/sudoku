@@ -97,6 +97,9 @@ class Board():
 
 	def set_board(self, board):
 		'Sets the current board to the given board.'
+		assert len(board) == 9
+		for row_index in range(9):
+			assert len(board[row_index]) == 9
 		self._board = board
 
 	def _box_indices(self, row: int, column: int):
