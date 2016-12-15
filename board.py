@@ -5,7 +5,14 @@
 import csv
 
 class Board():
-	'Class for handling the board state. This class is ignorant of game logic rules.'
+	'''
+	Class for handling the board state. This class is ignorant of game logic rules.
+		
+	Board dimensions are 9x9.
+
+	Empty cells are represented as the integer "0" and filled cells are represented
+		as their respective integers ("1" through "9").
+	'''
 
 	def __init__(self):
 		'Creates a blank 9x9 board and sets the current display_method.'
