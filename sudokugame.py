@@ -3,6 +3,7 @@
 # sudokugame.py
 
 import board
+import gameexceptions
 
 class Game():
 	'''Handles all the game logic and interfaces with the board to execute moves.'''
@@ -24,17 +25,20 @@ class Game():
 			(4) The number to enter is not 1-9
 		'''
 		if not self._is_in_bounds(row, column):
-			raise CellOutOfBoundsException
+			raise gameexceptions.CellOutOfBoundsException(row, column)
 		if self._is_cell_occupied(row, column):
-			raise OccupiedCellException
+			raise gameexceptions.OccupiedCellException((row, column), self.get_cell(row, column))
 		if self._is_move_in_same_row(row, number):
-			raise SameRowException
+			column_of_repeater = self.get_row(row`).index(number)
+			raise gameexceptions.SameRowException(row, column, column_of_repeater, number)
 		if self._is_move_in_same_column(column, number):
-			raise SameColumnException
+			row_of_repeater = self.get_column(column).index(number)
+			raise gameexceptions.SameColumnException
 		if self._is_move_in_same_box(row, column, number):
-			raise SameBoxException
+			index_in_box = self.get_box(row, column).index(number)
+			raise gameexceptions.SameBoxException(row, column, index_in_box, number)
 		if not self._is_number_valid(number):
-			raise InvalidEntryException
+			raise gameexceptions.InvalidEntryException(number)
 
 	def new_game(self):
 		'Undoes all moves to reset back to the loaded board.'
@@ -83,7 +87,7 @@ class Game():
 	def undo_move(self):
 		"Undoes the last move if possible. Otherwise throws an exception."
 		if len(self._undo_stack) == 0:
-			raise UndoStackException
+			raise gameexceptions.UndoStackException
 		row, column, number = self._undo_stack.pop()
 		self._redo_stack.append((row, column, number))
 		self._board.clear(row, column)
@@ -91,7 +95,7 @@ class Game():
 	def redo_move(self):
 		"Redoes the last move if possible. Otherwise throws an exception."
 		if len(self._redo_stack) == 0:
-			raise RedoStackException
+			raise gameexceptions.RedoStackException
 		row, column, number = self._redo_stack.pop()
 		self._undo_stack.append((row, column, number))
 		self._board.add(row, column, number)
@@ -119,10 +123,10 @@ class Game():
 		'Checks the victory conditions have been met.'
 		# check for a legal board
 		if len(self.get_board()) != 9:
-			raise BoardException
+			raise gameexceptions.BoardException
 		for row in self.get_board():
 			if len(row) != 9:
-				raise BoardException
+				raise gameexceptions.BoardException
 		# make sure rows have all numbers
 		for row_index in range(9):
 			row = self.get_row(row_index)
@@ -172,46 +176,3 @@ class Game():
 	def _is_number_valid(self, number: int):
 		'Checks if the number is 1-9.'
 		return (number <= 9) and (number >= 1)
-
-def get_game_exceptions():
-	'Returns all of the exceptions so that other modules can use them in their error handling'
-	return (OccupiedCellException, CellOutOfBoundsException, SameRowException,
-			SameColumnException, SameBoxException, InvalidEntryException, UndoStackException,
-			RedoStackException, BoardException)
-
-
-class OccupiedCellException(Exception):
-	'Exception for trying to make a move on an occupied cell.'
-	pass
-
-class CellOutOfBoundsException(Exception):
-	'Exception for giving coordinates that are outside of the board.'
-	pass
-
-class SameRowException(Exception):
-	'Exception for moves whose numbers have already been seen in the same row.'
-	pass
-
-class SameColumnException(Exception):
-	'Exception for moves whose numbers have already been seen in the same column.'
-	pass
-
-class SameBoxException(Exception):
-	'Exception for moves whose numbers have already been seen in the same box.'
-	pass
-
-class InvalidEntryException(Exception):
-	'Exception for entries that are not 1-9'
-	pass
-
-class UndoStackException(Exception):
-	'Exception for when the undo stack is empty and someone tries to undo a move.'
-	pass
-
-class RedoStackException(Exception):
-	'Exception for when the redo stack is empty and someone tries to redo a move.'
-	pass
-
-class BoardException(Exception):
-	'Exception for when something is wrong with the board.'
-	pass
