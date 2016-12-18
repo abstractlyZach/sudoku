@@ -29,11 +29,11 @@ class Game():
 		if self._is_cell_occupied(row, column):
 			raise gameexceptions.OccupiedCellException((row, column), self.get_cell(row, column))
 		if self._is_move_in_same_row(row, number):
-			column_of_repeater = self.get_row(row`).index(number)
+			column_of_repeater = self.get_row(row).index(number)
 			raise gameexceptions.SameRowException(row, column, column_of_repeater, number)
 		if self._is_move_in_same_column(column, number):
 			row_of_repeater = self.get_column(column).index(number)
-			raise gameexceptions.SameColumnException
+			raise gameexceptions.SameColumnException(row, row_of_repeater, column, number)
 		if self._is_move_in_same_box(row, column, number):
 			index_in_box = self.get_box(row, column).index(number)
 			raise gameexceptions.SameBoxException(row, column, index_in_box, number)
@@ -48,6 +48,10 @@ class Game():
 	def get_board(self):
 		'Returns a representation of the game board.'
 		return self._board.get_board()
+
+	def set_board(self, board):
+		'Given a board, sets the internal board if possible.'
+		self._board.set_board(board)
 
 	def get_cell(self, row: int, column: int):
 		'Returns the value of a cell.'
