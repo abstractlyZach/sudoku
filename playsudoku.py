@@ -1,6 +1,7 @@
 # playsudoku.py
 
 import sudokugame
+import gameexceptions
 import prompt
 import os
 
@@ -16,17 +17,24 @@ game.load_state(os.path.join('sudoku_states',
 
 print('TURN: {}'.format(turn_counter))
 game.print_board()
+
+def zero_and_eight_inclusive(integer_to_test):
+	'Used for checking row and column input.'
+	return 0 <= integer_to_test <= 8
+
 while not game.check_victory():
 	try:
-		row = prompt.for_int('Enter row')
-		column = prompt.for_int('Enter column')
-		number = prompt.for_int('Enter number')
+		row = prompt.for_int('Enter row', is_legal=zero_and_eight_inclusive)
+		column = prompt.for_int('Enter column', is_legal=zero_and_eight_inclusive)
+		print("Cell ({}, {}) contains: {}".format(row, column, game.get_cell(row, column)))
+		number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
 		game.make_move(row, column, number)
 		turn_counter += 1
 		print('TURN: {}'.format(turn_counter))
 		game.print_board()
-	except sudokugame.get_game_exceptions() as inst:
+	except gameexceptions.get_game_exceptions() as inst:
 		print('INVALID MOVE') # this will be more detailed later when I further study exceptions
 		print(inst)
 	except Exception as inst:
 		print(inst)
+

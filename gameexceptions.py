@@ -75,20 +75,38 @@ class SameBoxException(Exception):
 class InvalidEntryException(Exception):
 	'Exception for entries that are not 1-9'
 	def __init__(self, number):
-		message = '{} is not in the range [1-9]'
+		message = 'InvalidEntryException: {} is not in the range [1-9]'
 		super(Exception, self).__init__(message.format(number))
 
 
 class UndoStackException(Exception):
 	'Exception for when the undo stack is empty and someone tries to undo a move.'
-	pass
+	def __init__(self):
+		message = "UndoStackException: Undo stack is empty and an undo action was attempted."
+		super(Exception, self).__init__(message)
 
 
 class RedoStackException(Exception):
 	'Exception for when the redo stack is empty and someone tries to redo a move.'
-	pass
+	def __init__(self):
+		message = 'RedoStackException: Redo stack is empty and a redo action was attempted.'
+		super(Exception, self).__init__(message)
 
 
 class BoardException(Exception):
-	'Exception for when something is wrong with the board.'
-	pass
+	'Exception for when there are problems with the board.'
+	def __init__(self, message):
+		super(Exception, self).__init__(message)
+
+class TooManyRowsException(BoardException):
+	'Exception for when there are too many rows on the board.'
+	def __init__(self, number_of_rows):
+		message = 'TooManyRowsException: There are {} rows on the board.'
+		super(BoardException, self).__init__(message.format(number_of_rows))
+
+class TooManyColumnsException(BoardException):
+	'Exception for when there are too many columns on the board.'
+	def __init__(self, number_of_columns, row_that_has_too_many_columns):
+		message = 'TooManyColumnsException: There are {} columns in row {}.'
+		super(BoardException, self).__init__(message.format(number_of_columns, row_that_has_too_many_columns))
+

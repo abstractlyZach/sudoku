@@ -123,10 +123,10 @@ class Game():
 		'Checks the victory conditions have been met.'
 		# check for a legal board
 		if len(self.get_board()) != 9:
-			raise gameexceptions.BoardException
+			raise gameexceptions.TooManyRowsException(len(self.get_board()))
 		for row in self.get_board():
 			if len(row) != 9:
-				raise gameexceptions.BoardException
+				raise gameexceptions.TooManyColumnsException(len(row), row)
 		# make sure rows have all numbers
 		for row_index in range(9):
 			row = self.get_row(row_index)
