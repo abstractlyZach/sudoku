@@ -4,6 +4,7 @@
 
 import board
 import gameexceptions
+import copy
 
 class Game():
 	'''Handles all the game logic and interfaces with the board to execute moves.'''
@@ -51,7 +52,7 @@ class Game():
 
 	def set_board(self, board):
 		'Given a board, sets the internal board if possible.'
-		self._board.set_board(board)
+		self._board.set_board(copy.deepcopy(board))
 
 	def get_cell(self, row: int, column: int):
 		'Returns the value of a cell.'

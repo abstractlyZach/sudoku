@@ -3,6 +3,7 @@
 # board.py
 
 import csv
+import copy
 
 class Board():
 	'''
@@ -107,7 +108,7 @@ class Board():
 		assert len(board) == 9
 		for row_index in range(9):
 			assert len(board[row_index]) == 9
-		self._board = board
+		self._board = copy.deepcopy(board)
 
 	def _box_indices(self, row: int, column: int):
 		'Returns the indices for all the members of the given 3x3 box.'
