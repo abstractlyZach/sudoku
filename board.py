@@ -105,6 +105,7 @@ class Board():
 
 	def set_board(self, board):
 		'Sets the current board to the given board.'
+		# TODO: throw an exception instead of using assert statements
 		assert len(board) == 9
 		for row_index in range(9):
 			assert len(board[row_index]) == 9
