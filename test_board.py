@@ -59,6 +59,7 @@ class BasicBoardTestCase(unittest.TestCase):
 		test_board.set_board(incomplete_board)
 		self.assertEqual(test_board.get_board(), incomplete_board)
 
+
 class AdvancedBoardTestCase(unittest.TestCase):
 	def setUp(self):
 		self.test_board = board.Board()
@@ -197,6 +198,7 @@ class AdvancedBoardTestCase(unittest.TestCase):
 		os.remove('test_board.csv')
 		os.remove('test_board2.csv')
 		os.remove('test_board3.csv')
+
 
 if __name__ == '__main__':
 		unittest.main()
