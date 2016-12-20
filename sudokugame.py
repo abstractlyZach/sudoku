@@ -109,8 +109,28 @@ class Game():
 #	they have a ton of other decisions that probably relied on that move?
 #	Undoing all the way back to the move in question seems to be the only one that makes sense
 	def remove(self, row: int, column: int):
-		"Remove a number from the given cell"
-		pass
+		'''Remove a number from the given cell if that cell isn't permanent.
+			Returns the number removed.'''
+		if is_permanent(row, column):
+			raise gameexceptions.PermanentCellException((row, column))
+		else:
+			return self._board.clear(row, column)
+
+	def change(self, row: int, column: int, number: int):
+		'''Changes a number if its cell isn't permanent.
+			Returns the old number.'''
+		if is_permanent(row, column):
+			raise gameexceptions.PermanentCellException((row, column))
+		else:
+			return self._board.add(row, column, number)
+
+	def is_permanent(self, row: int, column: int):
+		'Returns true if a cell is permanent.'
+		return self._board.is_permanent(row, column)
+
+	def set_permanent(self):
+		'Sets all filled cells as permanent.'
+		self._board.set_permanent()
 
 # maybe have save states include undo and redo stacks. I'm still trying to figure out if that makes sense or not.
 	def save_state(self, state_name: str='save'):

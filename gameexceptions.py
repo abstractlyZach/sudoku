@@ -6,7 +6,14 @@ def get_game_exceptions():
 	'Returns all of the exceptions so that other modules can use them in their error handling'
 	return (OccupiedCellException, CellOutOfBoundsException, SameRowException,
 			SameColumnException, SameBoxException, InvalidEntryException, UndoStackException,
-			RedoStackException, BoardException)
+			RedoStackException, BoardException, PermanentCellException)
+
+
+class PermanentCellException(Exception):
+	'Exception for editing a permanent cell.'
+	def __init__(self, cell):
+		message = "PermanentCellException: Cell {} is marked as permanent."
+		super(Exception, self).__init__(message.format(cell))
 
 
 class OccupiedCellException(Exception):

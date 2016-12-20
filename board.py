@@ -18,6 +18,8 @@ class Board():
 	def __init__(self):
 		'Creates a blank 9x9 board and sets the current display_method.'
 		self._board = [[0 for i in range(9)] for j in range(9)]
+		self._permanency = [[False for i in range(9)] for j in range(9)]
+
 		self.set_display_method('print')
 
 	def get_board(self):
@@ -45,13 +47,26 @@ class Board():
 
 	def add(self, row: int, column: int, number):
 		'Changes the value of a cell to a certain number.'
+		old_number = self._board[row][column]
 		self._board[row][column] = number
+		return old_number
 
 	def clear(self, row: int, column: int):
 		'Clears the given cell and returns the number that was there.'
 		number = self.get_cell(row, column)
 		self._board[row][column] = 0
 		return number
+
+	def is_permanent(self, row: int, column: int):
+		'Returns true if the given cell is marked permanent.'
+		return self._permanency[row][column]
+
+	def set_permanent(self):
+		'Sets all filled cells as permanent.'
+		for row_index in range(9):
+			for column_index in range(9):
+				if get_cell(row_index, column_index) != 0:
+					self._permanency[row_index][column_index] = True
 
 	def to_csv(self, filename):
 		'Saves board to a csv file format at the given filename.'
