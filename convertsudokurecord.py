@@ -7,6 +7,7 @@
 import sys
 import os
 import board
+import constants
 
 class CellCounter():
 	def __init__(self):
@@ -24,7 +25,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		destination = sys.argv[2]
 	elif len(sys.argv) == 2:
-		destination = 'sudoku_states'
+		destination = constants.STATE_STORAGE_DIRECTORY
 	file_path = sys.argv[1]
 	file_name = os.path.basename(file_path)
 	file_prefix = file_name.split('.')[0] # the identifier for the pack
@@ -43,7 +44,7 @@ if __name__ == '__main__':
 	# add the current pack to the packlist and then reduce duplicates
 	current_packs = []
 	try:
-		with open('sudokupacklist.txt', 'r', encoding='utf-8') as packlist_file:
+		with open(constants.PACKLIST, 'r', encoding='utf-8') as packlist_file:
 			current_packs = packlist_file.readlines()
 			print(current_packs)
 	except FileNotFoundError:
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 	current_packs = set(current_packs)
 
 	# write the new packlist
-	with open('sudokupacklist.txt', 'w', encoding='utf-8') as packlist_file:
+	with open(constants.PACKLIST, 'w', encoding='utf-8') as packlist_file:
 		for pack in current_packs:
 			packlist_file.write(pack + '\n')
 
