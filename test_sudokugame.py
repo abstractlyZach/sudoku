@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
-#test_sudokugame.py
+# test_sudokugame.py
+
+# TODO: unit test permanency, changing, and removing
 
 import unittest
 import sudokugame

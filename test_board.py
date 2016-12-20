@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-#test_board.py
+# test_board.py
+# TODO: unit test permanency
 
 import unittest
 import board
