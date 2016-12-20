@@ -6,6 +6,8 @@ import prompt
 import os
 import constants
 
+TARGETED_GAME_ACTIONS = ['', 'r', 'c']
+
 def play(game):
 	'''Given a Game object, allows the player to perform various actions, 
 	such as saving its current state, adding pieces, or removing pieces.'''
@@ -16,12 +18,31 @@ def play(game):
 
 	while not game.check_victory():
 		try:
-			row = prompt.for_int('Enter row', is_legal=zero_and_eight_inclusive)
-			column = prompt.for_int('Enter column', is_legal=zero_and_eight_inclusive)
-			print("Cell ({}, {}) contains: {}".format(row, column, game.get_cell(row, column)))
-			number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
-			game.make_move(row, column, number)
-			turn_counter += 1
+			row, column = get_row_and_column_from_input(game)
+			valid_action = False
+			while not valid_action:
+				action = prompt.for_string(
+					'Enter action ("o" for options) ',
+					default='').lower()
+				if action == '':	# add number
+					number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
+					game.make_move(row, column, number)
+					turn_counter += 1
+					valid_action = True
+				elif action == 'r': # remove number
+					game.remove(row, column)
+					turn_counter += 1
+					valid_action = True
+				elif action == 'c': # change number
+					number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
+					game.change(row, column)
+					turn_counter += 1
+					valid_action = True
+				elif action == 'o': # list options
+					print('{:>10}:\t Add piece'.format('<Enter>'))
+					print('{:>10}:\t Remove piece'.format('r'))
+					print('{:>10}:\t Change piece'.format('c'))
+
 			print('TURN: {}'.format(turn_counter))
 			game.print_board()
 		except gameexceptions.get_game_exceptions() as inst:
@@ -30,6 +51,12 @@ def play(game):
 		except Exception as inst: # any other exceptions that aren't game exceptions
 			print(inst)
 
+
+def get_row_and_column_from_input(game=None):
+	row = prompt.for_int('Enter row', is_legal=zero_and_eight_inclusive)
+	column = prompt.for_int('Enter column', is_legal=zero_and_eight_inclusive)
+	print("Cell ({}, {}) contains: {}".format(row, column, game.get_cell(row, column)))
+	return row, column
 
 def zero_and_eight_inclusive(integer_to_test):
 	'Used for checking row and column input.'
