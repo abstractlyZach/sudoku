@@ -18,30 +18,20 @@ def play(game):
 
 	while not game.check_victory():
 		try:
-			row, column = get_row_and_column_from_input(game)
-			valid_action = False
-			while not valid_action:
-				action = prompt.for_string(
-					'Enter action ("o" for options) ',
-					default='').lower()
-				if action == '':	# add number
-					number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
-					game.make_move(row, column, number)
-					turn_counter += 1
-					valid_action = True
-				elif action == 'r': # remove number
-					game.remove(row, column)
-					turn_counter += 1
-					valid_action = True
-				elif action == 'c': # change number
-					number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
-					game.change(row, column, number)
-					turn_counter += 1
-					valid_action = True
-				elif action == 'o': # list options
-					print('{:>10}:\t Add piece'.format('<Enter>'))
-					print('{:>10}:\t Remove piece'.format('r'))
-					print('{:>10}:\t Change piece'.format('c'))
+			decision = main_turn_menu()
+			if decision == '':
+				turn_counter = targeted_action(game, turn_counter)
+
+			elif decision == 'u':
+				game.undo_move()
+				turn_counter -= 1
+
+			elif decision == 'r':
+				game.redo_move()
+				turn_counter += 1
+
+			elif decision == 'o': 
+				continue # jump back to main menu
 
 			print('TURN: {}'.format(turn_counter))
 			game.print_board()
@@ -50,6 +40,49 @@ def play(game):
 			print(inst)
 		except Exception as inst: # any other exceptions that aren't game exceptions
 			print(inst)
+
+def targeted_action(game, turn_counter):
+	row, column = get_row_and_column_from_input(game)
+	valid_action = False
+	while not valid_action:
+		action = prompt.for_string(
+			'Enter action ("o" for options) ',
+			default='').lower()
+		if action == '':	# add number
+			number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
+			game.make_move(row, column, number)
+			turn_counter += 1
+			valid_action = True
+		elif action == 'r': # remove number
+			game.remove(row, column)
+			turn_counter += 1
+			valid_action = True
+		elif action == 'c': # change number
+			number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
+			game.change(row, column, number)
+			turn_counter += 1
+			valid_action = True
+		elif action == 'o': # list options
+			print('{:>10}:\t Add piece'.format('<Enter>'))
+			print('{:>10}:\t Remove piece'.format('r'))
+			print('{:>10}:\t Change piece'.format('c'))
+			print('{:>10}:\t Return to main menu'.format('e'))
+		elif action == 'e': # exit the current prompt
+			valid_action = True
+	return turn_counter
+
+def main_turn_menu():
+	decision_valid = False
+	while not decision_valid:
+		decision = prompt.for_string('Next action ("o" to read options) ', default='')
+		if decision in ['', 'u', 'r', 'o']:
+			decision_valid = True
+			if decision == 'o':
+				print('{:>10}:\t Targeted action'.format('<Enter>'))
+				print('{:>10}:\t Undo move'.format('u'))
+				print('{:>10}:\t Redo move'.format('r'))
+	return decision
+
 
 
 def get_row_and_column_from_input(game=None):
