@@ -35,7 +35,7 @@ def play(game):
 					valid_action = True
 				elif action == 'c': # change number
 					number = prompt.for_int('Enter number', is_legal=(lambda x: 1 <= x <=9))
-					game.change(row, column)
+					game.change(row, column, number)
 					turn_counter += 1
 					valid_action = True
 				elif action == 'o': # list options

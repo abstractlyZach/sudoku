@@ -65,7 +65,7 @@ class Board():
 		'Sets all filled cells as permanent.'
 		for row_index in range(9):
 			for column_index in range(9):
-				if get_cell(row_index, column_index) != 0:
+				if self.get_cell(row_index, column_index) != 0:
 					self._permanency[row_index][column_index] = True
 
 	def to_csv(self, filename):
