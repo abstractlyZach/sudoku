@@ -42,7 +42,7 @@ class SameRowException(Exception):
 class SameColumnException(Exception):
 	'Exception for moves whose numbers have already been seen in the same column.'
 	def __init__(self, row_of_move, row_of_repeater, column, number):
-		message = 'SameColumnException: ({}, {}) is in the same row as ({}, {}) '
+		message = 'SameColumnException: ({}, {}) is in the same column as ({}, {}) '
 		message += 'and already contains the number {}.'
 		super(Exception, self).__init__(message.format(row_of_repeater, column,
 														row_of_move, column, number))
