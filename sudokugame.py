@@ -105,9 +105,6 @@ class Game():
 		self._undo_stack.append((row, column, number))
 		self._board.add(row, column, number)
 
-# I'm considering removing this method. Why would someone ever remove a move when
-#	they have a ton of other decisions that probably relied on that move?
-#	Undoing all the way back to the move in question seems to be the only one that makes sense
 	def remove(self, row: int, column: int):
 		'''Remove a number from the given cell if that cell isn't permanent.
 			Returns the number removed.'''
