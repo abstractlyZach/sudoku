@@ -4,6 +4,7 @@
 
 import board
 import gameexceptions
+import gameactions
 import copy
 
 class Game():
@@ -86,40 +87,56 @@ class Game():
 		'''
 		self.validate_move(row, column, number)
 		self._board.add(row, column, number)
-		self._undo_stack.append((row, column, number))
+		action = gameactions.AddAction(row, column, number)
+		self._undo_stack.append(action)
 		self._redo_stack = []
 
 	def undo_move(self):
-		"Undoes the last move if possible. Otherwise throws an exception."
+		'''Undoes the last move if possible. Otherwise throws an exception.'''
 		if len(self._undo_stack) == 0:
 			raise gameexceptions.UndoStackException
-		row, column, number = self._undo_stack.pop()
-		self._redo_stack.append((row, column, number))
-		self._board.clear(row, column)
+		action = self._undo_stack.pop()
+		# assuming the undo stack only involves non-permanent cells
+		number = action.get_old_number()
+		row, column = action.get_coordinates()
+		self._board.add(row, column, number)
+		self._redo_stack.append(action)
 
 	def redo_move(self):
 		"Redoes the last move if possible. Otherwise throws an exception."
 		if len(self._redo_stack) == 0:
 			raise gameexceptions.RedoStackException
-		row, column, number = self._redo_stack.pop()
-		self._undo_stack.append((row, column, number))
+		action = self._redo_stack.pop()
+		# assuming the undo stack only involves non-permanent cells
+		number = action.get_new_number()
+		row, column = action.get_coordinates()
 		self._board.add(row, column, number)
+		self._undo_stack.append(action)
+		
 
 	def remove(self, row: int, column: int):
 		'''Remove a number from the given cell if that cell isn't permanent.
 			Returns the number removed.'''
-		if is_permanent(row, column):
+		if self.is_permanent(row, column):
 			raise gameexceptions.PermanentCellException((row, column))
 		else:
-			return self._board.clear(row, column)
+			number = self._board.clear(row, column)
+			action = gameactions.RemoveAction(row, column, number)
+			self._undo_stack.append(action)
+			self._redo_stack = []
+			return number
 
 	def change(self, row: int, column: int, number: int):
 		'''Changes a number if its cell isn't permanent.
 			Returns the old number.'''
-		if is_permanent(row, column):
+		if self.is_permanent(row, column):
 			raise gameexceptions.PermanentCellException((row, column))
 		else:
-			return self._board.add(row, column, number)
+			old_number = self._board.add(row, column, number)
+			action = gameactions.ChangeAction(row, column, number, old_number)
+			self._undo_stack.append(action)
+			self._redo_stack = []
+			return old_number
 
 	def is_permanent(self, row: int, column: int):
 		'Returns true if a cell is permanent.'

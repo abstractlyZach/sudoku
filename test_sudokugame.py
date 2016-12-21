@@ -7,6 +7,7 @@
 import unittest
 import sudokugame
 import gameexceptions
+import gameactions
 import copy
 import board
 import os
@@ -238,13 +239,16 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [(1,1,2)])
+		self.assertEqual(self.game1._undo_stack, [gameactions.AddAction(1, 1, 2)])
 		self.assertEqual(self.game1._redo_stack, [])
 		self.assertRaises(gameexceptions.OccupiedCellException, self.game1.make_move, 1, 1, 3)
 
 	def test_undo(self):
 		self.game1.make_move(2, 3, 5)
 		self.game1.make_move(1, 2, 3)
+		move1 = gameactions.AddAction(2, 3, 5)
+		move2 = gameactions.AddAction(1, 2, 3)
+
 		self.game1.undo_move()
 		for row in range(9):
 			for column in range(9):
@@ -253,21 +257,23 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [(2, 3, 5)])
-		self.assertEqual(self.game1._redo_stack, [(1, 2, 3)])
+		self.assertEqual(self.game1._undo_stack, [move1])
+		self.assertEqual(self.game1._redo_stack, [move2])
 		# undo again
 		self.game1.undo_move()
 		for row in range(9):
 			for column in range(9):
 				self.assertEqual(self.game1.get_board()[row][column], 0)
 		self.assertEqual(self.game1._undo_stack, [])
-		self.assertEqual(self.game1._redo_stack, [(1, 2, 3), (2, 3, 5)])
+		self.assertEqual(self.game1._redo_stack, [move2, move1])
 		# illegal undo
 		self.assertRaises(gameexceptions.UndoStackException, self.game1.undo_move)
 
 	def test_redo(self):
 		self.game1.make_move(8, 8, 3)
 		self.game1.make_move(7, 2, 9)
+		move1 = gameactions.AddAction(8, 8, 3)
+		move2 = gameactions.AddAction(7, 2, 9)
 		self.game1.undo_move()
 		self.game1.undo_move()
 		self.game1.redo_move()
@@ -278,8 +284,8 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [(8, 8, 3)])
-		self.assertEqual(self.game1._redo_stack, [(7, 2, 9)])
+		self.assertEqual(self.game1._undo_stack, [move1])
+		self.assertEqual(self.game1._redo_stack, [move2])
 		# redo #2
 		self.game1.redo_move()
 		for row in range(9):
@@ -291,7 +297,7 @@ class MoveTestCase(unittest.TestCase):
 				else:
 					should_be = 0
 				self.assertEqual(self.game1.get_board()[row][column], should_be)
-		self.assertEqual(self.game1._undo_stack, [(8, 8, 3), (7, 2, 9)])
+		self.assertEqual(self.game1._undo_stack, [move1, move2])
 		self.assertEqual(self.game1._redo_stack, [])
 		# illegal redo
 		self.assertRaises(gameexceptions.RedoStackException, self.game1.redo_move)
@@ -320,9 +326,14 @@ class MoveTestCase(unittest.TestCase):
 		self.game1.make_move(7, 2, 9)
 		self.game1.make_move(2, 3, 3)
 		self.game1.make_move(4, 2, 7)
+		move1 = gameactions.AddAction(8, 2, 6)
+		move2 = gameactions.AddAction(7, 2, 9)
+		move3 = gameactions.AddAction(2, 3, 3)
+		move4 = gameactions.AddAction(4, 2, 7)
 		self.game1.undo_move()
 		self.game1.make_move(3, 5, 1)
-		self.assertEqual(self.game1._undo_stack, [(8,2,6), (7, 2, 9), (2, 3, 3), (3, 5, 1)])
+		move5 = gameactions.AddAction(3, 5, 1)
+		self.assertEqual(self.game1._undo_stack, [move1, move2, move3, move5])
 		self.assertEqual(self.game1._redo_stack, [])
 		
 	
