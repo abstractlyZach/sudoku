@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # test_board.py
-# TODO: unit test permanency
+# TODO: unit test permanency + setting and reading permanency
 
 import unittest
 import board

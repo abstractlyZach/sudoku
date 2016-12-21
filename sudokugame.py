@@ -2,7 +2,9 @@
 
 # sudokugame.py
 
+import os
 import board
+import constants
 import gameexceptions
 import gameactions
 import copy
@@ -49,7 +51,7 @@ class Game():
 
 	def get_board(self):
 		'Returns a representation of the game board.'
-		return self._board.get_board()
+		return copy.deepcopy(self._board.get_board())
 
 	def set_board(self, board):
 		'Given a board, sets the internal board if possible.'
@@ -152,11 +154,24 @@ class Game():
 		Saves the current state. Uses state_name to name the csv file in
 		the board's to_csv call.
 		'''
-		self._board.to_csv(state_name + '.csv')
+		file_name = state_name + '.csv'
+		file_path = os.path.join(constants.STATE_STORAGE_DIRECTORY, file_name)
+		self._board.to_csv(file_path)
+		permanency_file_path = os.path.join(constants.PERMANENCY_DIRECTORY, file_name)
+		self._board.write_permanency(permanency_file_path)
+		
 
 	def load_state(self, state_name: str='save'):
-		'Loads a board state'
-		self._board.read_csv(state_name + '.csv')
+		'''Loads a board state. If the permanency file does not exist, then this is 
+		the original puzzle, so all non-zero cells must be permanent'''
+		file_name = state_name + '.csv'
+		file_path = os.path.join(constants.STATE_STORAGE_DIRECTORY, file_name)
+		self._board.read_csv(file_path)
+		permanency_file_path = os.path.join(constants.PERMANENCY_DIRECTORY, file_name)
+		try:
+			self._board.read_permanency(permanency_file_path)
+		except FileNotFoundError: # permanency file doesn't exist
+			self.set_permanent()
 
 	def check_victory(self) -> bool:
 		'Checks the victory conditions have been met.'

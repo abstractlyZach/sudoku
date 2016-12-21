@@ -6,6 +6,14 @@ import prompt
 import os
 import constants
 
+def y_or_n(input):
+	return input.lower() == 'y' or input.lower() == 'n'
+
+def prompt_load_pack():
+	load_pack = prompt.for_string('Start a new game', default='y', 
+									is_legal=y_or_n, error_message='(y/n)')
+	return load_pack.lower() == 'y'
+
 def play(game):
 	'''Given a Game object, allows the player to perform various actions, 
 	such as saving its current state, adding pieces, or removing pieces.'''
@@ -38,6 +46,29 @@ def play(game):
 				print('Goodbye!')
 				print()
 				return
+
+			elif decision == 'l':
+				load_successful = False
+				while not load_successful:
+					try:
+						save_state_name = prompt.for_string('Name of the save state ("q" to exit)')
+						if save_state_name == 'q':
+							load_successful = True
+						else:
+							game.load_state(save_state_name)
+							load_successful = True
+							turn_counter = 0 # reset turn counter now that a new game is loaded
+					except FileNotFoundError as e:
+						print(e)
+
+			elif decision == 's':
+				confirmation = 'n'
+				while confirmation != 'y':
+					save_state_name = prompt.for_string('Name of the save state ("q" to exit)')
+					print('Save state is "{}"'.format(save_state_name))
+					confirmation = prompt.for_string('Are you sure? (y/n)', default='y')
+				game.save_state(save_state_name)
+
 
 			show_board = True
 			print()
@@ -91,12 +122,14 @@ def main_turn_menu():
 	decision_valid = False
 	while not decision_valid:
 		decision = prompt.for_string('Next action ("o" to read options) ', default='')
-		if decision in ['', 'u', 'r', 'o', 'q']:
+		if decision in ['', 'u', 'r', 'o', 'q', 'l', 's']:
 			decision_valid = True
 			if decision == 'o':
 				print('{:>10}:\t Targeted action'.format('<Enter>'))
 				print('{:>10}:\t Undo move'.format('u'))
 				print('{:>10}:\t Redo move'.format('r'))
+				print('{:>10}:\t Load state'.format('l'))				
+				print('{:>10}:\t Save state'.format('s'))
 				print('{:>10}:\t Quit'.format('q'))
 	return decision
 

@@ -68,6 +68,29 @@ class Board():
 				if self.get_cell(row_index, column_index) != 0:
 					self._permanency[row_index][column_index] = True
 
+	def write_permanency(self, filename):
+		'Writes the permanency to a csv file format with the given filename.'
+		with open(filename, 'w') as write_file:
+			writer = csv.writer(write_file, delimiter=',')
+			for row in self._permanency:
+				to_write = [int(item) for item in row]
+				writer.writerow(to_write)
+
+	def read_permanency(self, filename):
+		'Reads and sets the permanency from a csv file with the given filename.'
+		with open(filename, 'r') as read_file:
+			reader = csv.reader(read_file, delimiter=',')
+			new_permanency = []
+			for row in reader:
+				row_list = []
+				for cell in row:
+					row_list.append(bool(int(cell)))
+				new_permanency.append(row_list)
+		assert len(new_permanency) == 9
+		for row in new_permanency:
+			assert len(row) == 9
+		self._permanency = new_permanency
+
 	def to_csv(self, filename):
 		'Saves board to a csv file format at the given filename.'
 		with open(filename, 'w') as write_file:
@@ -85,8 +108,10 @@ class Board():
 				for cell in row:
 					row_list.append(int(cell))
 				new_board.append(row_list)
+		assert len(new_board) == 9
+		for row in new_board:
+			assert len(row) == 9
 		self.set_board(new_board)
-
 
 	def print_board(self):
 		'Prints the board.'
