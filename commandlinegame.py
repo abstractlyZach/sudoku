@@ -6,18 +6,18 @@ import prompt
 import os
 import constants
 
-TARGETED_GAME_ACTIONS = ['', 'r', 'c']
-
 def play(game):
 	'''Given a Game object, allows the player to perform various actions, 
 	such as saving its current state, adding pieces, or removing pieces.'''
 	turn_counter = 0
-
-	print('TURN: {}'.format(turn_counter))
-	game.print_board()
+	show_board = True
 
 	while not game.check_victory():
 		try:
+			if show_board:
+				print('TURN: {}'.format(turn_counter))
+				game.print_board()
+
 			decision = main_turn_menu()
 			if decision == '':
 				turn_counter = targeted_action(game, turn_counter)
@@ -31,15 +31,30 @@ def play(game):
 				turn_counter += 1
 
 			elif decision == 'o': 
+				show_board = False
 				continue # jump back to main menu
 
-			print('TURN: {}'.format(turn_counter))
-			game.print_board()
+			elif decision == 'q':
+				print('Goodbye!')
+				print()
+				return
+
+			show_board = True
+			print()
+			print()
+			
 		except gameexceptions.get_game_exceptions() as inst:
 			print('INVALID MOVE') # this will be more detailed later when I further study exceptions
 			print(inst)
 		except Exception as inst: # any other exceptions that aren't game exceptions
 			print(inst)
+
+	print('Turns taken: {}'.format(turn_counter))
+	game.print_board()
+	print('YOU WIN!!!')
+	print()
+	return
+
 
 def targeted_action(game, turn_counter):
 	row, column = get_row_and_column_from_input(game)
@@ -71,18 +86,19 @@ def targeted_action(game, turn_counter):
 			valid_action = True
 	return turn_counter
 
+
 def main_turn_menu():
 	decision_valid = False
 	while not decision_valid:
 		decision = prompt.for_string('Next action ("o" to read options) ', default='')
-		if decision in ['', 'u', 'r', 'o']:
+		if decision in ['', 'u', 'r', 'o', 'q']:
 			decision_valid = True
 			if decision == 'o':
 				print('{:>10}:\t Targeted action'.format('<Enter>'))
 				print('{:>10}:\t Undo move'.format('u'))
 				print('{:>10}:\t Redo move'.format('r'))
+				print('{:>10}:\t Quit'.format('q'))
 	return decision
-
 
 
 def get_row_and_column_from_input(game=None):
@@ -90,6 +106,7 @@ def get_row_and_column_from_input(game=None):
 	column = prompt.for_int('Enter column', is_legal=zero_and_eight_inclusive)
 	print("Cell ({}, {}) contains: {}".format(row, column, game.get_cell(row, column)))
 	return row, column
+
 
 def zero_and_eight_inclusive(integer_to_test):
 	'Used for checking row and column input.'
@@ -115,5 +132,3 @@ def get_sudoku_number_from_input():
 								default=0,
 								error_message='Please enter a non-negative integer.')
 	return sudoku_number
-
-
