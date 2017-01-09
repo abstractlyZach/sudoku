@@ -79,13 +79,13 @@ class SudokuApplication:
 			sticky=ALL_SIDES)
 		for row in range(3):
 			for column in range(3):
-				def button_functions():
-					string_append(self._sidebar_text, 
-						'button ({}, {}) clicked!\n'.format(row, column))
-
 				cell = tkinter.Button(master=box, 
-					text='{}, {}'.format(first_row + row, first_column + column),
-					command=button_functions)
+					text='{}, {}'.format(first_row + row, first_column + column))
+					#command=self.handle_button_press)
+				cell.bind('<Button-1>', self.handle_button_press)
+				# add row and column attributes to make the button into a useful object
+				cell.row = row + first_row
+				cell.column = column + first_column
 				cell.grid(row=row, column=column, sticky=ALL_SIDES)
 
 		# configuration of this box
@@ -93,6 +93,11 @@ class SudokuApplication:
 			box.rowconfigure(row, weight=1)
 		for column in range(3):
 			box.columnconfigure(column, weight=1)
+
+	def handle_button_press(self, button_press_event):
+		button = button_press_event.widget
+		row, column = button.row, button.column 
+		string_append(self._sidebar_text, "button ({}, {}) pressed!\n".format(row, column))
 
 	def run(self):
 		self._root_window.mainloop()
