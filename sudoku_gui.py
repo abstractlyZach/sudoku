@@ -53,19 +53,19 @@ class SudokuApplication:
 
 	def _create_board_view(self):
 		# sudoku board view
-		# self._board_frame = tkinter.Frame(master=self._root_window, background='#000000')
-		# self._board_frame.grid(row=1, column=0, padx=10, pady=10, sticky=ALL_SIDES)
+		self._board_frame = tkinter.Frame(master=self._root_window, background='#000000')
+		self._board_frame.grid(row=1, column=0, padx=10, pady=10, sticky=ALL_SIDES)
 
-		# # boxes
-		# for row in range(3):
-		# 	for column in range(3):
-		# 		self._create_box(row, column)
+		# boxes
+		for row in range(3):
+			for column in range(3):
+				self._create_box(row, column)
 
-		# # box grid configuration
-		# for row in range(3):
-		# 	self._board_frame.rowconfigure(row, weight=1)
-		# for column in range(3):
-		# 	self._board_frame.columnconfigure(column, weight=1)
+		# box grid configuration
+		for row in range(3):
+			self._board_frame.rowconfigure(row, weight=1)
+		for column in range(3):
+			self._board_frame.columnconfigure(column, weight=1)
 
 
 	def _create_box(self, board_row, board_column):
@@ -93,9 +93,6 @@ class SudokuApplication:
 			box.rowconfigure(row, weight=1)
 		for column in range(3):
 			box.columnconfigure(column, weight=1)
-
-	def on_button_clicked(self):
-		string_append(self._sidebar_text, 'button clicked!\n')
 
 	def run(self):
 		self._root_window.mainloop()
