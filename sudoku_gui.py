@@ -7,14 +7,17 @@ ALL_SIDES = tkinter.N + tkinter.S + tkinter.E + tkinter.W
 
 class SudokuApplication:
 	def __init__(self):
-		# text that goes in the sidebar
-		self._sidebar_text = ''
-		self._create_main_window()
-
-	def _create_main_window(self):
 		# main window
 		self._root_window = tkinter.Tk()
+		
+		# text that goes in the sidebar
+		self._sidebar_text = tkinter.StringVar(master=self._root_window)
 
+		self._create_main_window()
+		string_append(self._sidebar_text, 'Log:\n')
+		string_append(self._sidebar_text, 'abcdefg\n')
+
+	def _create_main_window(self):
 		# title text (row 0, column 0)
 		self._create_title()
 
@@ -45,18 +48,25 @@ class SudokuApplication:
 							# wraplength 400 is really 40. idk why.
 							# http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/label.html
 			# anchors the text to the top of the widget
-			anchor=tkinter.N) 
+			anchor=tkinter.N + tkinter.W) 
 		self._sidebar.grid(row=0, column=1, padx=10, pady=15, rowspan=2, sticky=ALL_SIDES)
 
 	def _create_board_view(self):
 		# sudoku board view
-		self._board_frame = tkinter.Frame(master=self._root_window, background='#FFFFFF')
+		self._board_frame = tkinter.Frame(master=self._root_window, background='#000000')
 		self._board_frame.grid(row=1, column=0, padx=10, pady=10, sticky=ALL_SIDES)
 
 		# boxes
 		for row in range(3):
 			for column in range(3):
 				self._create_box(row, column)
+
+		# box grid configuration
+		for row in range(3):
+			self._board_frame.rowconfigure(row, weight=1)
+		for column in range(3):
+			self._board_frame.columnconfigure(column, weight=1)
+
 
 		# for row in range(9):
 		# 	for column in range(9):
@@ -77,17 +87,33 @@ class SudokuApplication:
 		# coords of the first cell in the box
 		first_row = board_row * 3
 		first_column = board_column * 3
-		box = tkinter.Frame(master=self._board_frame, background='#000000')
-		box.grid(row=board_row, column=board_column, padx=20, pady=20, sticky=ALL_SIDES)
+		# box divider thickness
+		box_pad = 1
+		box = tkinter.Frame(master=self._board_frame)
+		box.grid(row=board_row, column=board_column, padx=box_pad, pady=box_pad, 
+			sticky=ALL_SIDES)
 		for row in range(3):
 			for column in range(3):
 				cell = tkinter.Button(master=box, 
-					text='{}, {}'.format(first_row + row, first_column + column))
+					text='{}, {}'.format(first_row + row, first_column + column),
+					command=self.on_button_clicked)
 				cell.grid(row=row, column=column, sticky=ALL_SIDES)
 
+		# configuration of this box
+		for row in range(3):
+			box.rowconfigure(row, weight=1)
+		for column in range(3):
+			box.columnconfigure(column, weight=1)
+
+	def on_button_clicked(self):
+		string_append(self._sidebar_text, 'button clicked!\n')
 
 	def run(self):
 		self._root_window.mainloop()
+
+def string_append(string_var, text):
+	'Takes a tkinter.StringVar and appends text to it.'
+	string_var.set(string_var.get() + text)
 
 if __name__ == '__main__':
 	SudokuApplication().run()
