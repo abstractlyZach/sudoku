@@ -1,6 +1,7 @@
 # sudoku_gui.py
 
 import tkinter
+import sudoku_button
 
 DEFAULT_FONT = ('Helvetica', 20)
 ALL_SIDES = tkinter.N + tkinter.S + tkinter.E + tkinter.W
@@ -79,14 +80,18 @@ class SudokuApplication:
 			sticky=ALL_SIDES)
 		for row in range(3):
 			for column in range(3):
-				cell = tkinter.Button(master=box, 
+				cell = sudoku_button.SudokuButton(master=box, 
 					text='{}, {}'.format(first_row + row, first_column + column))
 					#command=self.handle_button_press)
-				cell.bind('<Button-1>', self.handle_button_press)
+				cell.bind('<Button-1>', self._handle_left_click)
+				cell.bind('<Button-3>', self._handle_right_click)
 				# add row and column attributes to make the button into a useful object
 				cell.row = row + first_row
 				cell.column = column + first_column
 				cell.grid(row=row, column=column, sticky=ALL_SIDES)
+				if row <=7 and column % 3 == 0:
+					cell.lock()
+					print(cell.cget('state'))
 
 		# configuration of this box
 		for row in range(3):
@@ -94,10 +99,17 @@ class SudokuApplication:
 		for column in range(3):
 			box.columnconfigure(column, weight=1)
 
-	def handle_button_press(self, button_press_event):
+	def _handle_left_click(self, button_press_event):
 		button = button_press_event.widget
-		row, column = button.row, button.column 
-		string_append(self._sidebar_text, "button ({}, {}) pressed!\n".format(row, column))
+		if not button.is_locked():
+			row, column = button.row, button.column 
+			# string_append(self._sidebar_text, "button ({}, {}) pressed!\n".format(row, column))
+			button.increment()
+
+	def _handle_right_click(self, button_press_event):
+		button = button_press_event.widget
+		if not button.is_locked():
+			button.clear()
 
 	def run(self):
 		self._root_window.mainloop()
