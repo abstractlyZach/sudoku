@@ -4,19 +4,21 @@ import tkinter
 
 # text that buttons show when there is no entry at the moment
 _EMPTY_TEXT = '  '
+_DEFAULT_BUTTON_COLOR = '#d9d9d9'
+_DISABLED_BUTTON_COLOR = '#a9a9a9'
 
 class SudokuButton(tkinter.Button):
 	def __init__(self, *args, **kwargs):
 		# inherit from tkinter.Button
 		super().__init__(*args, **kwargs)
+		# set button color to default
+		self.config(bg=_DEFAULT_BUTTON_COLOR)
 		# set up the button text
 		self._button_text = tkinter.StringVar()
 		self._button_text.set(_EMPTY_TEXT)
 		self.config(textvariable=self._button_text)
 		# initialize the number
 		self._number = 0
-		# locked button color
-		self.config(disabledforeground='#FFFFFF')
 
 	def get_coords(self):
 		return (self._row, self._column)
@@ -49,7 +51,11 @@ class SudokuButton(tkinter.Button):
 	def lock(self):
 		'Grays out and disables the button'
 		self.config(state=tkinter.DISABLED)
-		self.config(bg='#a9a9a9')
+		self.config(bg=_DISABLED_BUTTON_COLOR)
+
+	def unlock(self):
+		self.config(state=tkinter.NORMAL)
+		self.config(bg=_DEFAULT_BUTTON_COLOR)
 
 	def get_state(self):
 		return self.cget('state')
