@@ -18,9 +18,9 @@ class Game():
 		self._undo_stack = []
 		self._redo_stack = []
 
-	def validate_move(self, row: int, column: int, number: int):
+	def validate_add(self, row: int, column: int, number: int):
 		'''
-		Validates a move. If no exceptions are raised, the move is valid.
+		Validates an add action. If no exceptions are raised, the move is valid.
 		This function will raise the appropriate exception for the validity of the move
 		Needs to check:
 			(1) Cell is within the board's bounds
@@ -43,6 +43,31 @@ class Game():
 			raise gameexceptions.SameBoxException(row, column, index_in_box, number)
 		if not self._is_number_valid(number):
 			raise gameexceptions.InvalidEntryException(number)
+
+	def validate_remove(self, row: int, column: int):
+		'''
+		Validates a remove command.
+		'''
+		if not self._is_in_bounds(row, column):
+			raise gameexceptions.CellOutOfBoundsException(row, column)
+	
+	def validate_change(self, row: int, column: int):
+		'''
+		Validates a change command.
+		'''
+		if not self._is_in_bounds(row, column):
+			raise gameexceptions.CellOutOfBoundsException(row, column)
+		if self._is_move_in_same_row(row, number):
+			column_of_repeater = self.get_row(row).index(number)
+			raise gameexceptions.SameRowException(row, column, column_of_repeater, number)
+		if self._is_move_in_same_column(column, number):
+			row_of_repeater = self.get_column(column).index(number)
+			raise gameexceptions.SameColumnException(row, row_of_repeater, column, number)
+		if self._is_move_in_same_box(row, column, number):
+			index_in_box = self.get_box(row, column).index(number)
+			raise gameexceptions.SameBoxException(row, column, index_in_box, number)
+		if not self._is_number_valid(number):
+			raise gameexceptions.InvalidEntryException(number)					
 
 	def new_game(self):
 		'Undoes all moves to reset back to the loaded board.'
@@ -87,7 +112,7 @@ class Game():
 		Executes a move if it's valid. Otherwise, throws an error. Making a move clears
 		the redo stack and adds an item to the undo stack.
 		'''
-		self.validate_move(row, column, number)
+		self.validate_add(row, column, number)
 		self._board.add(row, column, number)
 		action = gameactions.AddAction(row, column, number)
 		self._undo_stack.append(action)
@@ -119,6 +144,7 @@ class Game():
 	def remove(self, row: int, column: int):
 		'''Remove a number from the given cell if that cell isn't permanent.
 			Returns the number removed.'''
+		self.validate_remove(row, column)
 		if self.is_permanent(row, column):
 			raise gameexceptions.PermanentCellException((row, column))
 		else:
@@ -131,6 +157,7 @@ class Game():
 	def change(self, row: int, column: int, number: int):
 		'''Changes a number if its cell isn't permanent.
 			Returns the old number.'''
+		self.validate_change(row, column, number)
 		if self.is_permanent(row, column):
 			raise gameexceptions.PermanentCellException((row, column))
 		else:
