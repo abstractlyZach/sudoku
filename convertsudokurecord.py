@@ -15,11 +15,11 @@ class CellCounter():
 		self.column = 0
 
 	def increment(self):
-		if self.row + 1 >= 9:
-			self.column += 1
-			self.row = 0
-		else:
+		if self.column + 1 >= 9:
 			self.row += 1
+			self.column = 0
+		else:
+			self.column += 1
 
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
