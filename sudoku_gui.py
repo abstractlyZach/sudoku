@@ -68,21 +68,6 @@ class SudokuApplication:
 			self._board_frame.columnconfigure(column, weight=1)
 
 
-		# for row in range(9):
-		# 	for column in range(9):
-		# 		cell = tkinter.Button(master=self._board_frame, 
-		# 			text='{}, {}'.format(row, column),
-		# 			font=DEFAULT_FONT)
-		# 		cell.grid(row=row, column=column, sticky=ALL_SIDES)
-
-		# # board row configuration
-		# for row in range(9):
-		# 	self._board_frame.rowconfigure(row, weight=1)
-
-		# # board column configuration
-		# for column in range(9):
-		# 	self._board_frame.columnconfigure(column, weight=1)
-
 	def _create_box(self, board_row, board_column):
 		# coords of the first cell in the box
 		first_row = board_row * 3
@@ -94,9 +79,13 @@ class SudokuApplication:
 			sticky=ALL_SIDES)
 		for row in range(3):
 			for column in range(3):
+				def button_functions():
+					string_append(self._sidebar_text, 
+						'button ({}, {}) clicked!\n'.format(row, column))
+
 				cell = tkinter.Button(master=box, 
 					text='{}, {}'.format(first_row + row, first_column + column),
-					command=self.on_button_clicked)
+					command=button_functions)
 				cell.grid(row=row, column=column, sticky=ALL_SIDES)
 
 		# configuration of this box
