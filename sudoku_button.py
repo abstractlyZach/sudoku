@@ -7,6 +7,7 @@ import gameexceptions
 _EMPTY_TEXT = '  '
 _DEFAULT_BUTTON_COLOR = '#d9d9d9'
 _DISABLED_BUTTON_COLOR = '#a9a9a9'
+_BLACK = '#000000'
 
 class SudokuButton(tkinter.Button):
 	def __init__(self, *args, **kwargs):
@@ -21,6 +22,8 @@ class SudokuButton(tkinter.Button):
 		super().__init__(*args, **kwargs)
 		# set button color to default
 		self.set_color(_DEFAULT_BUTTON_COLOR)
+		# set text color when button is disabled
+		self.config(disabledforeground=_BLACK)
 		# this variable tracks what color the button should be when it's not highlighted
 		self._base_button_color = _DEFAULT_BUTTON_COLOR
 		# set up the button text
@@ -82,7 +85,7 @@ class SudokuButton(tkinter.Button):
 		'Grays out and disables the button'
 		if not self._superlocked:
 			self.config(state=tkinter.DISABLED)
-			self.set_color(DISABLED_BUTTON_COLOR)
+			self.set_color(_DISABLED_BUTTON_COLOR)
 			self._base_button_color = _DISABLED_BUTTON_COLOR
 
 

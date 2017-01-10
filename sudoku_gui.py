@@ -4,15 +4,16 @@ import tkinter
 import sudoku_button
 import sudokugame
 import board
+import gameexceptions
 
 DEFAULT_FONT = ('Helvetica', 20)
 ALL_SIDES = tkinter.N + tkinter.S + tkinter.E + tkinter.W
 _ERROR_HIGHLIGHT_COLOR = '#FF0000'
 
 class SudokuApplication:
-	def __init__(self):
+	def __init__(self, game=sudokugame.Game()):
 		# game model
-		self._game = sudokugame.Game()
+		self._game = game
 
 		# container for accessing buttons. 2-D array
 		self._buttons = [[None for i in range(9)] for i in range(9)]
@@ -27,9 +28,7 @@ class SudokuApplication:
 		string_append(self._sidebar_text, 'Log:\n')
 		string_append(self._sidebar_text, 'abcdefg\n')
 
-		self.highlight_row(2)
-		self.highlight_column(7)
-		self.highlight_box(5, 1)
+		self.load_game('0_00000')
 
 	def _create_main_window(self):
 		# title text (row 0, column 0)
@@ -105,6 +104,15 @@ class SudokuApplication:
 				# place the button into the button container
 				self._buttons[row][column] = cell
 
+				# set up the button according to the game model
+				number = self._game.get_cell(row, column)
+				if number == 0:
+					cell.clear()
+				else:
+					cell.set_number(number)
+				if self._game.is_permanent(row, column):
+					cell.superlock()
+
 		# configuration of this box
 		for row_in_box in range(3):
 			box.rowconfigure(row_in_box, weight=1)
@@ -118,16 +126,23 @@ class SudokuApplication:
 			row, column = button.get_coords()
 			number = button.get_number()
 			self._game.force_change(row, column, number)
-			self._game.print_board()
-			try:
-				self._game.validate_board()
-			except Exception as e:
-				print(e)
+			self.refresh_highlighting()
+
 
 	def _handle_right_click(self, button_press_event):
 		button = button_press_event.widget
 		if not button.is_locked():
 			button.clear()
+			row, column = button.get_coords()
+			self._game.remove(row, column)
+			self.refresh_highlighting()
+
+	def load_game(self, state_name):
+		'''Loads a save state and its permanency data. Every cell marked permanent 
+		gets superlocked on the GUI'''
+		self._game.load_state(state_name)
+		self._board_frame.destroy()
+		self._create_board_view()
 
 	def get_button(self, row, column):
 		return self._buttons[row][column]
@@ -158,6 +173,18 @@ class SudokuApplication:
 			for column_index in range(9):
 				button = self.get_button(row_index, column_index)
 				button.dehighlight()
+
+	def refresh_highlighting(self):
+		'Clears highlighting and highlights the first problem it finds.'
+		self.clear_highlighting()
+		try:
+			self._game.validate_board()
+		except gameexceptions.SameRowException as e:
+			self.highlight_row(e.row)
+		except gameexceptions.SameColumnException as e:
+			self.highlight_column(e.column)
+		except gameexceptions.SameBoxException as e:
+			self.highlight_box(*e.coord)
 
 	def run(self):
 		self._root_window.mainloop()

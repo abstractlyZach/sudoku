@@ -33,6 +33,7 @@ class CellOutOfBoundsException(Exception):
 class SameRowException(Exception):
 	'Exception for moves whose numbers have already been seen in the same row.'
 	def __init__(self, row, column_of_move, column_of_repeater, number):
+		self.row = row
 		message = 'SameRowException: ({}, {}) is in the same row as ({}, {}) '
 		message += 'and already contains the number {}.'
 		super(Exception, self).__init__(message.format(row, column_of_repeater, 
@@ -42,6 +43,7 @@ class SameRowException(Exception):
 class SameColumnException(Exception):
 	'Exception for moves whose numbers have already been seen in the same column.'
 	def __init__(self, row_of_move, row_of_repeater, column, number):
+		self.column = column
 		message = 'SameColumnException: ({}, {}) is in the same column as ({}, {}) '
 		message += 'and already contains the number {}.'
 		super(Exception, self).__init__(message.format(row_of_repeater, column,
@@ -51,6 +53,7 @@ class SameColumnException(Exception):
 class SameBoxException(Exception):
 	'Exception for moves whose numbers have already been seen in the same box.'
 	def __init__(self, row, column, index_of_repeater, number):
+		self.coord = (row, column)
 		message = 'SameBoxException: There is an entry in the {} '
 		message += 'cell in the same box as ({}, {}) with the number {}.'
 		repeater_column = index_of_repeater % 3

@@ -103,7 +103,7 @@ class Game():
 				if box.count(number) > 1:
 					index_in_box = box.index(number)
 					# same as above
-					raise gameexceptions.SameBoxException(99, 99, index_in_box, number)
+					raise gameexceptions.SameBoxException(row, column, index_in_box, number)
 
 	def new_game(self):
 		'Undoes all moves to reset back to the loaded board.'
