@@ -41,7 +41,7 @@ class Board():
 	def get_box(self, row: int, column: int):
 		'Returns the values of the 3x3 box that the given cell is a member of.'
 		value_list = []
-		for box_row, box_column in self._box_indices(row, column):
+		for box_row, box_column in self.get_box_indices(row, column):
 			value_list.append(self.get_cell(box_row, box_column))
 		return value_list
 
@@ -151,8 +151,10 @@ class Board():
 			assert len(board[row_index]) == 9
 		self._board = copy.deepcopy(board)
 
-	def _box_indices(self, row: int, column: int):
-		'Returns the indices for all the members of the given 3x3 box.'
+	def get_box_indices(self, row: int, column: int):
+		'''Returns the indices for all the members of the given 3x3 box.
+		Indexes are formatted as (row, column)
+		'''
 		index_list = []
 		first_row = (row // 3) * 3
 		first_column = (column // 3) * 3

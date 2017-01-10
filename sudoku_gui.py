@@ -2,12 +2,21 @@
 
 import tkinter
 import sudoku_button
+import sudokugame
+import board
 
 DEFAULT_FONT = ('Helvetica', 20)
 ALL_SIDES = tkinter.N + tkinter.S + tkinter.E + tkinter.W
+_ERROR_HIGHLIGHT_COLOR = '#FF0000'
 
 class SudokuApplication:
 	def __init__(self):
+		# game model
+		self._game = sudokugame.Game()
+
+		# container for accessing buttons. 2-D array
+		self._buttons = [[None for i in range(9)] for i in range(9)]
+
 		# main window
 		self._root_window = tkinter.Tk()
 		
@@ -17,6 +26,10 @@ class SudokuApplication:
 		self._create_main_window()
 		string_append(self._sidebar_text, 'Log:\n')
 		string_append(self._sidebar_text, 'abcdefg\n')
+
+		self.highlight_row(2)
+		self.highlight_column(7)
+		self.highlight_box(5, 1)
 
 	def _create_main_window(self):
 		# title text (row 0, column 0)
@@ -75,41 +88,76 @@ class SudokuApplication:
 		first_column = board_column * 3
 		# box divider thickness
 		box_pad = 1
+
+		# set up the buttons
 		box = tkinter.Frame(master=self._board_frame)
 		box.grid(row=board_row, column=board_column, padx=box_pad, pady=box_pad, 
 			sticky=ALL_SIDES)
-		for row in range(3):
-			for column in range(3):
-				cell = sudoku_button.SudokuButton(master=box, 
-					text='{}, {}'.format(first_row + row, first_column + column))
-					#command=self.handle_button_press)
+		for row_in_box in range(3):
+			for column_in_box in range(3):
+				row = row_in_box + first_row
+				column = column_in_box + first_column
+				cell = sudoku_button.SudokuButton(master=box, row=row, column=column)
 				cell.bind('<Button-1>', self._handle_left_click)
 				cell.bind('<Button-3>', self._handle_right_click)
 				# add row and column attributes to make the button into a useful object
-				cell.row = row + first_row
-				cell.column = column + first_column
-				cell.grid(row=row, column=column, sticky=ALL_SIDES)
-				if row <=7 and column % 3 == 0:
-					cell.lock()
-					print(cell.cget('state'))
+				cell.grid(row=row_in_box, column=column_in_box, sticky=ALL_SIDES)
+				# place the button into the button container
+				self._buttons[row][column] = cell
 
 		# configuration of this box
-		for row in range(3):
-			box.rowconfigure(row, weight=1)
-		for column in range(3):
-			box.columnconfigure(column, weight=1)
+		for row_in_box in range(3):
+			box.rowconfigure(row_in_box, weight=1)
+		for column_in_box in range(3):
+			box.columnconfigure(column_in_box, weight=1)
 
 	def _handle_left_click(self, button_press_event):
 		button = button_press_event.widget
 		if not button.is_locked():
-			row, column = button.row, button.column 
-			# string_append(self._sidebar_text, "button ({}, {}) pressed!\n".format(row, column))
 			button.increment()
+			row, column = button.get_coords()
+			number = button.get_number()
+			self._game.force_change(row, column, number)
+			self._game.print_board()
+			try:
+				self._game.validate_board()
+			except Exception as e:
+				print(e)
 
 	def _handle_right_click(self, button_press_event):
 		button = button_press_event.widget
 		if not button.is_locked():
 			button.clear()
+
+	def get_button(self, row, column):
+		return self._buttons[row][column]
+
+	def highlight_row(self, row, color=_ERROR_HIGHLIGHT_COLOR):
+		'Highlights a row of buttons'
+		for button_index in range(9):
+			button = self.get_button(row, button_index)
+			button.highlight(color)
+
+	def highlight_column(self, column, color=_ERROR_HIGHLIGHT_COLOR):
+		'Highlights a column of buttons'
+		for button_index in range(9):
+			button = self.get_button(button_index, column)
+			button.highlight(color)
+
+	def highlight_box(self, row, column, color=_ERROR_HIGHLIGHT_COLOR):
+		'Highlights the buttons that are in the same box'
+		box_coords = board.Board.get_box_indices(None, row, column)
+		for box_coord in box_coords:
+			row, column = box_coord
+			button = self.get_button(row, column)
+			button.highlight(color)
+
+	def clear_highlighting(self):
+		'Clears highlighting for all buttons.'
+		for row_index in range(9):
+			for column_index in range(9):
+				button = self.get_button(row_index, column_index)
+				button.dehighlight()
 
 	def run(self):
 		self._root_window.mainloop()

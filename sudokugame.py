@@ -51,7 +51,7 @@ class Game():
 		if not self._is_in_bounds(row, column):
 			raise gameexceptions.CellOutOfBoundsException(row, column)
 	
-	def validate_change(self, row: int, column: int):
+	def validate_change(self, row: int, column: int, number: int):
 		'''
 		Validates a change command.
 		'''
@@ -67,7 +67,43 @@ class Game():
 			index_in_box = self.get_box(row, column).index(number)
 			raise gameexceptions.SameBoxException(row, column, index_in_box, number)
 		if not self._is_number_valid(number):
-			raise gameexceptions.InvalidEntryException(number)					
+			raise gameexceptions.InvalidEntryException(number)	
+
+	def validate_force_change(self, row: int, column: int, number: int):
+		if not self._is_in_bounds(row, column):
+			raise gameexceptions.CellOutOfBoundsException(row, column)		
+		if not self._is_number_valid(number):
+			raise gameexceptions.InvalidEntryException(number)	
+
+	def validate_board(self):
+		'Validates the whole board and throws the first exception it finds'
+		for row_index in range(9):				
+			row = self.get_row(row_index)
+			for number in range(1, 10):
+				if row.count(number) > 1:
+					column_of_repeater = row.index(number)
+					# column of repeater is doubled because it's a lot of extra work 
+					# for an exception that won't be seen
+					raise gameexceptions.SameRowException(row_index, 
+						column_of_repeater, column_of_repeater, number)
+		for column_index in range(9):
+			column = self.get_column(column_index)
+			for number in range(1, 10):
+				if column.count(number) > 1:
+					# same as column of repeater above
+					row_of_repeater = column.index(number)
+					raise gameexceptions.SameColumnException(row_of_repeater, row_of_repeater,
+						column_index, number)
+		for box_coord in [(0, 0), (3, 0), (6, 0), 
+							(0, 3), (3, 3), (6, 3), 
+							(0, 6), (3, 6), (6, 6)]:
+			row, column = box_coord
+			box = self.get_box(row, column)
+			for number in range(1, 10):
+				if box.count(number) > 1:
+					index_in_box = box.index(number)
+					# same as above
+					raise gameexceptions.SameBoxException(99, 99, index_in_box, number)
 
 	def new_game(self):
 		'Undoes all moves to reset back to the loaded board.'
@@ -166,6 +202,18 @@ class Game():
 			self._undo_stack.append(action)
 			self._redo_stack = []
 			return old_number
+
+	def force_change(self, row: int, column: int, number: int):
+		'''Forces a change on a cell without checking for conflicts'''
+		self.validate_force_change(row, column, number)
+		if self.is_permanent(row, column):
+			raise gameexceptions.PermanentCellException((row, column))
+		else:
+			old_number = self._board.add(row, column, number)
+			action = gameactions.ChangeAction(row, column, number, old_number)
+			self._undo_stack.append(action)
+			self._redo_stack = []
+			return old_number 
 
 	def is_permanent(self, row: int, column: int):
 		'Returns true if a cell is permanent.'
