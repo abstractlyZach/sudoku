@@ -40,6 +40,9 @@ class SudokuApplication:
 		# board (row 1, column 0)
 		self._create_board_view()
 
+		# button dock (row 2, column 0)
+		self._create_button_dock()
+
 		# main window row configuration
 		self._root_window.rowconfigure(0, weight=0)
 		self._root_window.rowconfigure(1, weight=1)
@@ -119,6 +122,75 @@ class SudokuApplication:
 		for column_in_box in range(3):
 			box.columnconfigure(column_in_box, weight=1)
 
+	def _create_button_dock(self):
+		self._button_dock = tkinter.Frame(master=self._root_window)
+		self._button_dock.grid(row=2, column=0, padx=20, pady=20, sticky=ALL_SIDES, 
+			columnspan=2)
+
+		# save button
+		save_button = tkinter.Button(master=self._button_dock,
+			text='Save', 
+			command=self._save_to_default)
+		save_button.grid(row=0, column=0, padx=10, pady=10, sticky=tkinter.W)
+
+		# load button
+		load_button = tkinter.Button(master=self._button_dock, 
+			text='Load',
+			command=self._load_from_default)
+		load_button.grid(row=0, column=1, padx=10, pady=10, sticky=tkinter.E)
+
+		# clear button
+		clear_button = tkinter.Button(master=self._button_dock,
+			text='Clear',
+			command=self._clear_board)
+		clear_button.grid(row=0, column=2, padx=10, pady=10)
+		# should add an "are you sure?" dialog
+
+		# undo button
+		undo_button = tkinter.Button(master=self._button_dock,
+			text='Undo',
+			command=self._undo)
+		undo_button.grid(row=0, column=3, padx=10, pady=10)
+
+		# redo button
+		redo_button = tkinter.Button(master=self._button_dock,
+			text='Redo',
+			command=self._redo)
+		redo_button.grid(row=0, column=4, padx=10, pady=10)
+
+	def _save_to_default(self):
+		self._game.save_state()
+
+	def _load_from_default(self):
+		self.load_game()
+
+	def _clear_board(self):
+		'Clears the board except for the original numbers'
+		self._game.reset()
+		# self._board_frame.destroy()
+		self._create_board_view()
+		self.refresh_highlighting()
+
+	def _undo(self):
+		action = self._game.undo_move()
+		row, column = action.get_coordinates()
+		old_number = action.get_old_number()
+		if old_number == 0:
+			self.get_button(row, column).clear()
+		else:
+			self.get_button(row, column).set_number(old_number)
+		self.refresh_highlighting()
+
+	def _redo(self):
+		action = self._game.redo_move()
+		row, column = action.get_coordinates()
+		new_number = action.get_new_number()
+		if new_number == 0:
+			self.get_button(row, column).clear()
+		else:
+			self.get_button(row, column).set_number(new_number)
+		self.refresh_highlighting()
+
 	def _handle_left_click(self, button_press_event):
 		button = button_press_event.widget
 		if not button.is_locked():
@@ -128,6 +200,11 @@ class SudokuApplication:
 			self._game.force_change(row, column, number)
 			self.refresh_highlighting()
 
+			# check victory condition
+			if self._game.check_victory():
+				string_append(self._sidebar_text, 'You win!\n')
+				for row in range(9):
+					self.highlight_row(row, '#00FF00')
 
 	def _handle_right_click(self, button_press_event):
 		button = button_press_event.widget
@@ -137,12 +214,16 @@ class SudokuApplication:
 			self._game.remove(row, column)
 			self.refresh_highlighting()
 
-	def load_game(self, state_name):
+	def load_game(self, state_name=None):
 		'''Loads a save state and its permanency data. Every cell marked permanent 
 		gets superlocked on the GUI'''
-		self._game.load_state(state_name)
-		self._board_frame.destroy()
+		if state_name == None:
+			self._game.load_state()
+		else:
+			self._game.load_state(state_name)
+		# self._board_frame.destroy()
 		self._create_board_view()
+		self.refresh_highlighting()
 
 	def get_button(self, row, column):
 		return self._buttons[row][column]

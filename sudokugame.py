@@ -110,6 +110,16 @@ class Game():
 		for move in range(len(self._undo_stack)):
 			self.undo_move()
 
+	# This might be a better new game function. Could replace it.
+	def reset(self):
+		'Clears every cell except for the permanent ones.'
+		for row_index in range(9):
+			for column_index in range(9):
+				if not self.is_permanent(row_index, column_index):
+					self.remove(row_index, column_index)
+		self._redo_stack = []
+		self._undo_stack = []
+
 	def get_board(self):
 		'Returns a representation of the game board.'
 		return copy.deepcopy(self._board.get_board())
@@ -155,7 +165,8 @@ class Game():
 		self._redo_stack = []
 
 	def undo_move(self):
-		'''Undoes the last move if possible. Otherwise throws an exception.'''
+		'''Undoes the last move if possible. Otherwise throws an exception.
+		Returns the action in case a UI needs to know what happened.'''
 		if len(self._undo_stack) == 0:
 			raise gameexceptions.UndoStackException
 		action = self._undo_stack.pop()
@@ -164,9 +175,11 @@ class Game():
 		row, column = action.get_coordinates()
 		self._board.add(row, column, number)
 		self._redo_stack.append(action)
+		return action
 
 	def redo_move(self):
-		"Redoes the last move if possible. Otherwise throws an exception."
+		'''Redoes the last move if possible. Otherwise throws an exception.
+		Returns the action in case a UI needs to know what happened.'''
 		if len(self._redo_stack) == 0:
 			raise gameexceptions.RedoStackException
 		action = self._redo_stack.pop()
@@ -175,7 +188,7 @@ class Game():
 		row, column = action.get_coordinates()
 		self._board.add(row, column, number)
 		self._undo_stack.append(action)
-		
+		return action
 
 	def remove(self, row: int, column: int):
 		'''Remove a number from the given cell if that cell isn't permanent.
