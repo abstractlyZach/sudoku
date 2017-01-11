@@ -102,6 +102,13 @@ class SudokuButton(tkinter.Button):
 			self.set_color(_DEFAULT_BUTTON_COLOR)			
 			self._base_button_color = _DEFAULT_BUTTON_COLOR
 
+	def toggle_lock(self):
+		'Toggles the status of the lock, doing nothing in the case of superlocks'
+		if self.is_locked():
+			self.unlock()
+		else:
+			self.lock()
+
 	def get_state(self):
 		return self.cget('state')
 
