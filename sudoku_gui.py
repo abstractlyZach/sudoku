@@ -28,13 +28,12 @@ class SudokuApplication:
 		self._sidebar_text = tkinter.StringVar(master=self._root_window)
 
 		self._create_main_window()
-		self.write_to_sidebar('Log:')
-		self.write_to_sidebar('aeiou')
+		self.write_to_sidebar("Press 'a' to turn lock mode on/off.")
 
 		self._root_window.bind("a", self._toggle_lock_mode)
 
-		# self.load_game('0_00000')
-		self.load_game('almost_complete')
+		self.load_game('0_00000')
+		# self.load_game('almost_complete')
 
 	def _create_main_window(self):
 		# title text (row 0, column 0)
@@ -48,6 +47,12 @@ class SudokuApplication:
 
 		# button dock (row 2, column 0)
 		self._create_button_dock()
+
+		self._mode_text = tkinter.StringVar(master=self._root_window)
+		self._mode_label = tkinter.Label(master=self._root_window, 
+			textvariable=self._mode_text)
+		self._mode_label.grid(row=3, column=0, padx=10, pady=10, 
+			sticky=tkinter.S + tkinter.W)
 
 		# main window row configuration
 		self._root_window.rowconfigure(0, weight=0)
@@ -175,7 +180,7 @@ class SudokuApplication:
 		self._game.reset()
 		# self._board_frame.destroy()
 		self._create_board_view()
-		self.refresh_highlighting()
+		self.refresh_borders()
 
 	def _undo(self):
 		action = self._game.undo_move()
@@ -185,7 +190,7 @@ class SudokuApplication:
 			self.get_button(row, column).clear()
 		else:
 			self.get_button(row, column).set_number(old_number)
-		self.refresh_highlighting()
+		self.refresh_borders()
 
 	def _redo(self):
 		action = self._game.redo_move()
@@ -195,7 +200,7 @@ class SudokuApplication:
 			self.get_button(row, column).clear()
 		else:
 			self.get_button(row, column).set_number(new_number)
-		self.refresh_highlighting()
+		self.refresh_borders()
 
 	def _handle_left_click(self, button_press_event):
 		button = button_press_event.widget
@@ -207,7 +212,7 @@ class SudokuApplication:
 				row, column = button.get_coords()
 				number = button.get_number()
 				self._game.force_change(row, column, number)
-				self.refresh_highlighting()
+				self.refresh_borders()
 
 				# check victory condition
 				if self._game.check_victory():
@@ -221,15 +226,15 @@ class SudokuApplication:
 			button.clear()
 			row, column = button.get_coords()
 			self._game.remove(row, column)
-			self.refresh_highlighting()
+			self.refresh_borders()
 
 	def _toggle_lock_mode(self, key_press_event):
 		"Allows a user to change the lock state of cells unless they're superlocked"
 		self._lock_mode = not self._lock_mode
 		if self._lock_mode:
-			self.write_to_sidebar('lock mode on')
+			self._mode_text.set("lock mode")
 		else:
-			self.write_to_sidebar('lock mode off')
+			self._mode_text.set("")
 
 	def load_game(self, state_name=None):
 		'''Loads a save state and its permanency data. Every cell marked permanent 
@@ -240,7 +245,7 @@ class SudokuApplication:
 			self._game.load_state(state_name)
 		# self._board_frame.destroy()
 		self._create_board_view()
-		self.refresh_highlighting()
+		self.refresh_borders()
 
 	def get_button(self, row, column):
 		return self._buttons[row][column]
@@ -272,21 +277,48 @@ class SudokuApplication:
 				button = self.get_button(row_index, column_index)
 				button.dehighlight()
 
-	def refresh_highlighting(self):
+	def border_row(self, row, color=_ERROR_HIGHLIGHT_COLOR):
+		'Borders a row of buttons'
+		for button_index in range(9):
+			button = self.get_button(row, button_index)
+			button.border(color, 1)
+
+	def border_column(self, column, color=_ERROR_HIGHLIGHT_COLOR):
+		'Highlights a column of buttons'
+		for button_index in range(9):
+			button = self.get_button(button_index, column)
+			button.border(color, 1)
+
+	def border_box(self, row, column, color=_ERROR_HIGHLIGHT_COLOR):
+		'Highlights the buttons that are in the same box'
+		box_coords = board.Board.get_box_indices(None, row, column)
+		for box_coord in box_coords:
+			row, column = box_coord
+			button = self.get_button(row, column)
+			button.border(color, 1)
+
+	def clear_borders(self):
+		'Removes borders for all buttons.'
+		for row_index in range(9):
+			for column_index in range(9):
+				button = self.get_button(row_index, column_index)
+				button.remove_border()
+
+	def refresh_borders(self):
 		'Clears highlighting and highlights the first problem it finds.'
-		self.clear_highlighting()
+		self.clear_borders()
 		try:
 			self._game.validate_board()
 		except gameexceptions.SameRowException as e:
-			self.highlight_row(e.row)
+			self.border_row(e.row)
 		except gameexceptions.SameColumnException as e:
-			self.highlight_column(e.column)
+			self.border_column(e.column)
 		except gameexceptions.SameBoxException as e:
-			self.highlight_box(*e.coord)
+			self.border_box(*e.coord)
 
 	def update_board_view(self):
 		# TODO: figure out how to run AI code and display it through the GUI
-		self.refresh_highlighting()
+		self.refresh_borders()
 
 	def write_to_sidebar(self, text, end='\n'):
 		'Adds a line of text to the sidebar'
