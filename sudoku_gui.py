@@ -20,15 +20,21 @@ class SudokuApplication:
 
 		# main window
 		self._root_window = tkinter.Tk()
+
+		# set lock mode
+		self._lock_mode = False
 		
 		# text that goes in the sidebar
 		self._sidebar_text = tkinter.StringVar(master=self._root_window)
 
 		self._create_main_window()
-		string_append(self._sidebar_text, 'Log:\n')
-		string_append(self._sidebar_text, 'abcdefg\n')
+		self.write_to_sidebar('Log:')
+		self.write_to_sidebar('aeiou')
 
-		self.load_game('0_00000')
+		self._root_window.bind("a", self._toggle_lock_mode)
+
+		# self.load_game('0_00000')
+		self.load_game('almost_complete')
 
 	def _create_main_window(self):
 		# title text (row 0, column 0)
@@ -193,18 +199,21 @@ class SudokuApplication:
 
 	def _handle_left_click(self, button_press_event):
 		button = button_press_event.widget
-		if not button.is_locked():
-			button.increment()
-			row, column = button.get_coords()
-			number = button.get_number()
-			self._game.force_change(row, column, number)
-			self.refresh_highlighting()
+		if self._lock_mode:
+			button.toggle_lock()
+		else:
+			if not button.is_locked():
+				button.increment()
+				row, column = button.get_coords()
+				number = button.get_number()
+				self._game.force_change(row, column, number)
+				self.refresh_highlighting()
 
-			# check victory condition
-			if self._game.check_victory():
-				string_append(self._sidebar_text, 'You win!\n')
-				for row in range(9):
-					self.highlight_row(row, '#00FF00')
+				# check victory condition
+				if self._game.check_victory():
+					string_append(self._sidebar_text, 'You win!\n')
+					for row in range(9):
+						self.highlight_row(row, '#00FF00')
 
 	def _handle_right_click(self, button_press_event):
 		button = button_press_event.widget
@@ -213,6 +222,14 @@ class SudokuApplication:
 			row, column = button.get_coords()
 			self._game.remove(row, column)
 			self.refresh_highlighting()
+
+	def _toggle_lock_mode(self, key_press_event):
+		"Allows a user to change the lock state of cells unless they're superlocked"
+		self._lock_mode = not self._lock_mode
+		if self._lock_mode:
+			self.write_to_sidebar('lock mode on')
+		else:
+			self.write_to_sidebar('lock mode off')
 
 	def load_game(self, state_name=None):
 		'''Loads a save state and its permanency data. Every cell marked permanent 
@@ -267,8 +284,17 @@ class SudokuApplication:
 		except gameexceptions.SameBoxException as e:
 			self.highlight_box(*e.coord)
 
+	def update_board_view(self):
+		# TODO: figure out how to run AI code and display it through the GUI
+		self.refresh_highlighting()
+
+	def write_to_sidebar(self, text, end='\n'):
+		'Adds a line of text to the sidebar'
+		string_append(self._sidebar_text, text + end)
+
 	def run(self):
 		self._root_window.mainloop()
+
 
 def string_append(string_var, text):
 	'Takes a tkinter.StringVar and appends text to it.'
