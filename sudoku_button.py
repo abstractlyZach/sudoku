@@ -59,6 +59,13 @@ class SudokuButton(tkinter.Button):
 		Does not change the base button color'''
 		self.config(bg=color)
 
+	def border(self, color, thickness):
+		self.config(highlightbackground=color)
+		self.config(highlightthickness=thickness)
+
+	def remove_border(self):
+		self.config(highlightbackground=_DEFAULT_BUTTON_COLOR)
+
 	def highlight(self, color):
 		self.set_color(color)
 
@@ -87,7 +94,6 @@ class SudokuButton(tkinter.Button):
 			self.config(state=tkinter.DISABLED)
 			self.set_color(_DISABLED_BUTTON_COLOR)
 			self._base_button_color = _DISABLED_BUTTON_COLOR
-
 
 	def superlock(self):
 		'''Permanently locks down this button. Be careful!
