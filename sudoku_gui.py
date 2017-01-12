@@ -5,10 +5,12 @@ import sudoku_button
 import sudokugame
 import board
 import gameexceptions
+import time
 
 DEFAULT_FONT = ('Helvetica', 20)
 ALL_SIDES = tkinter.N + tkinter.S + tkinter.E + tkinter.W
 _ERROR_HIGHLIGHT_COLOR = '#FF0000'
+AI_TURN_DELAY = 2000
 
 class SudokuApplication:
 	def __init__(self, game=sudokugame.Game()):
@@ -23,6 +25,9 @@ class SudokuApplication:
 
 		# set lock mode
 		self._lock_mode = False
+
+		# set polling mode
+		self._polling = False
 		
 		# text that goes in the sidebar
 		self._sidebar_text = tkinter.StringVar(master=self._root_window)
@@ -34,6 +39,18 @@ class SudokuApplication:
 
 		self.load_game('0_00000')
 		# self.load_game('almost_complete')
+
+	def poll_ai(self):
+		'Polls the set AI for the next move'
+		if self._polling:
+			self.write_to_sidebar('after 2s')
+			# move = self._ai.get_move()
+			# self._game.make_move(move)
+			# self.update_board_view()
+			self._root_window.after(AI_TURN_DELAY, self.poll_ai)
+		else:
+			return
+
 
 	def _create_main_window(self):
 		# title text (row 0, column 0)
@@ -53,6 +70,11 @@ class SudokuApplication:
 			textvariable=self._mode_text)
 		self._mode_label.grid(row=3, column=0, padx=10, pady=10, 
 			sticky=tkinter.S + tkinter.W)
+
+		self._ai_running_text = tkinter.StringVar(master=self._root_window)
+		self._ai_running_label = tkinter.Label(master=self._root_window,
+			textvariable=self._ai_running_text)
+		self._ai_running_label.grid(row=3, column=1, padx=10, pady=10)
 
 		# main window row configuration
 		self._root_window.rowconfigure(0, weight=0)
@@ -135,39 +157,47 @@ class SudokuApplication:
 
 	def _create_button_dock(self):
 		self._button_dock = tkinter.Frame(master=self._root_window)
-		self._button_dock.grid(row=2, column=0, padx=20, pady=20, sticky=ALL_SIDES, 
+		self._button_dock.grid(row=2, column=0, padx=4, pady=2, sticky=ALL_SIDES, 
 			columnspan=2)
 
 		# save button
 		save_button = tkinter.Button(master=self._button_dock,
 			text='Save', 
 			command=self._save_to_default)
-		save_button.grid(row=0, column=0, padx=10, pady=10, sticky=tkinter.W)
+		save_button.grid(row=0, column=0, padx=7, pady=3, sticky=tkinter.W)
 
 		# load button
 		load_button = tkinter.Button(master=self._button_dock, 
 			text='Load',
 			command=self._load_from_default)
-		load_button.grid(row=0, column=1, padx=10, pady=10, sticky=tkinter.E)
+		load_button.grid(row=0, column=1, padx=7, pady=3, sticky=tkinter.E)
 
 		# clear button
 		clear_button = tkinter.Button(master=self._button_dock,
 			text='Clear',
 			command=self._clear_board)
-		clear_button.grid(row=0, column=2, padx=10, pady=10)
+		clear_button.grid(row=0, column=2, padx=10, pady=3)
 		# should add an "are you sure?" dialog
 
 		# undo button
 		undo_button = tkinter.Button(master=self._button_dock,
 			text='Undo',
 			command=self._undo)
-		undo_button.grid(row=0, column=3, padx=10, pady=10)
+		undo_button.grid(row=0, column=3, padx=10, pady=3)
 
 		# redo button
 		redo_button = tkinter.Button(master=self._button_dock,
 			text='Redo',
 			command=self._redo)
-		redo_button.grid(row=0, column=4, padx=10, pady=10)
+		redo_button.grid(row=0, column=4, padx=10, pady=3)
+
+		# run ai button
+		self._run_ai_button_text = tkinter.StringVar(master=self._root_window)
+		self._run_ai_button_text.set('Run AI')
+		run_ai_button = tkinter.Button(master=self._button_dock,
+			textvariable=self._run_ai_button_text,
+			command=self._toggle_polling)
+		run_ai_button.grid(row=0, column=5, padx=10, pady=3)
 
 	def _save_to_default(self):
 		self._game.save_state()
@@ -227,6 +257,18 @@ class SudokuApplication:
 			row, column = button.get_coords()
 			self._game.remove(row, column)
 			self.refresh_borders()
+
+	def _toggle_polling(self):
+		'Turns AI polling on and off. Starts the AI polling loop if polling gets turned on.'
+		if self._polling:
+			self._polling = False
+			self._run_ai_button_text.set('Run AI')
+			self._ai_running_text.set('')
+		else:
+			self._polling = True
+			self._run_ai_button_text.set('Stop AI')
+			self._ai_running_text.set('AI is running...')
+			self.poll_ai()
 
 	def _toggle_lock_mode(self, key_press_event):
 		"Allows a user to change the lock state of cells unless they're superlocked"
